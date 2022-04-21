@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>微聊</title>
+		<link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">    
+		<script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"> </script>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1" />
+	</head>
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+			list-style-type: none;
+			text-decoration: none;
+		}
+		html,
+		body {
+		}
+		.box{
+			overflow: auto;
+			position: relative;
+			background-color: #2080C3;
+		}
+		.container{
+			flex: 1;
+			background-color: #2080C3;
+			width: 100%;
+			height: 100%;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-end;
+			padding: 12px;
+			box-sizing: border-box;
+			padding-bottom: 0;
+		}
+		.phoneSwiperBox{
+			position: relative;
+		}
+		.phoneSwiperBox-filter{
+			position: relative;
+			width: 100%;
+			height: 100%;
+			z-index: 2;
+		}
+		.downloadapp{
+			flex: 1;
+			padding-bottom: 20px;
+		}
+		.downloadapp-img{
+			width:300px;
+			height: 300px;
+			border-radius: 24px;
+		}
+		.downloadapp{
+			color: #fff;
+		}
+		.downloadapp h1{
+			margin-top: 20px;
+			font-weight: normal;
+		}
+		.downloadapp p{
+			margin: 14px 0;
+		}
+		.downloadapp{
+			text-align: center;
+		}
+		.downloadapp span{
+			color: #dedede;
+			font-size: 14px;
+		}
+		.container-top{
+			width: 100%;
+			margin-bottom: 80px;
+			text-align: center;
+			color: #fff;
+		}
+		.container-app{
+			display: flex;flex-direction: row;flex-wrap: wrap;
+		}
+		.container-app-swiper{
+			z-index: 3;
+			width: 45.7%;
+			height: 87.4%;
+			position: absolute;
+			top: 1.9%;
+			left: 41.7%;
+			background-color: #ffffff;
+			overflow: hidden;
+			border-radius: 18px;
+		}
+		.container-top h1{
+			margin-top: 30px;
+		}
+		.container-top h1,.container-top h2,.container-top h3{
+			margin-bottom: 25px;
+			font-weight: normal;
+		}
+		.swiper{
+			height: 100%;
+		}
+		.swiper-slide{
+			height: 100%;
+		}
+		.swiper-slide img{
+			width: 100%;
+			height: 100%;
+		}
+		@media screen and (max-width:750px) {
+			.container-top h1{}
+			.container-top h2{font-size: 16px;}
+			.container-top{
+				margin-bottom: 0;
+			}
+		}
+		.downloadapp-btn{
+			display: block;
+			cursor: pointer;
+			width: 190px;
+			background-color: #12B600;
+			border-radius: 14px;
+			margin: 10px auto;
+			padding: 8px 0;
+			color: #fff;
+		}
+		.downloadapp-btn:hover{
+			background-color: #11b000;
+		}
+	</style>
+	<body>
+		<div class="box">
+			<div class="container">
+				<div class="container-top">
+					<h1>《微聊》</h1>
+					<h2>单人、群聊、朋友圈、摇一摇、附近的人、收藏、扫码加好友、机器人聊天、文字、图片、名片、音/视频通话 等...</h2>
+					<h3>你能想到的这里都有</h3>
+				</div>
+				<div class="container-app">
+					<div class="phoneSwiperBox">
+						<img class="phoneSwiperBox-filter" src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01neGaa71Z0xcslX3At_!!87413133.png" >
+						<div class="container-app-swiper">
+							<div class="swiper">
+							  <div class="swiper-wrapper">
+							    <div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i2/87413133/O1CN017NSpYx1Z0xcvYxEbO_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i1/87413133/O1CN01Oq8SLw1Z0xcukUdV0_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i2/87413133/O1CN01xOYaIK1Z0xco9If2e_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01Pe8G6S1Z0xcmQluDI_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01bZSz2q1Z0xco96F1t_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i2/87413133/O1CN01mD2wwN1Z0xctYYdAA_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i1/87413133/O1CN012JP8VW1Z0xccuWKzM_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i4/87413133/O1CN01fMUNJA1Z0xck1w0kt_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01n8MZhZ1Z0xctYZEbM_!!87413133.jpg" >
+								</div>
+								<div class="swiper-slide">
+									<img src="https://img.alicdn.com/imgextra/i2/87413133/O1CN017vPSbK1Z0xcqoFn8E_!!87413133.jpg" >
+								</div>
+							  </div>
+							</div>
+						</div>
+					</div>
+					<div class="downloadapp">
+						<h1>微聊下载</h1>
+						<p>考拉Team微聊，精仿微信，仅提供学习研究请勿商业使用！</p>
+						<p>技术栈：uniapp(vue3)、Java</p>
+						<img class="downloadapp-img" src="https://q3z3-im.oss-cn-beijing.aliyuncs.com/public/20220419162017.png" >
+						<div class="downloadapp-smbtn">扫码下载体验安卓端</div>
+						<a target="_blank" href="http://im.q3z3.com/public/im.apk" class="downloadapp-btn">下载安卓端</a>
+						<span>苹果端敬请期待</span>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		
+	</body>
+</html>
+
+<script>
+var mySwiper = new Swiper('.swiper', {
+	autoplay: true,//可选选项，自动滑动
+	loop: true
+})
+</script>
