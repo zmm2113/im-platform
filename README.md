@@ -3,6 +3,7 @@
 + 页面暂时借鉴`微信`的UI，后期如果有人支持，就出一款自己的UI。
 + 目前只用uniapp实现了手机端APP，后期如果有人支持，会继续实现桌面版和web版的。
 + 项目第一版历时2个月，前端使用`uniapp`，后端使用`SpringBoot`。
++ 您的支持，就是我们【生发的动力】。
 + 前端源码地址：[https://gitee.com/lakaola/im-uniapp](https://gitee.com/lakaola/im-uniapp)
 + 后端源码地址：[https://gitee.com/lakaola/im-platform](https://gitee.com/lakaola/im-platform)
 
