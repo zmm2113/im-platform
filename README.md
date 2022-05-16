@@ -26,7 +26,7 @@
 忽略。。。
 
 #### 六、请作者喝杯茶吧
-忽略。。。
+<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01Ilrbqk1Z0xcwW5PsK_!!87413133.jpg" width="600">
 
 #### 七、未来计划（二期计划6月1日之后重启项目）
 + 更换手机端UI为自定义UI
