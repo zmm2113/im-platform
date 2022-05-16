@@ -37,16 +37,10 @@
 + 小程序端和h5端体验也要等到下个版本，换完UI。
 
 #### 五、演示效果
-<img src="https://img.alicdn.com/imgextra/i2/87413133/O1CN01mD2wwN1Z0xctYYdAA_!!87413133.jpg" width="200">
-<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01bZSz2q1Z0xco96F1t_!!87413133.jpg" width="200">
-<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01Pe8G6S1Z0xcmQluDI_!!87413133.jpg" width="200">
-<img src="https://img.alicdn.com/imgextra/i1/87413133/O1CN012JP8VW1Z0xccuWKzM_!!87413133.jpg" width="200">
-<img src="https://img.alicdn.com/imgextra/i4/87413133/O1CN01fMUNJA1Z0xck1w0kt_!!87413133.jpg" width="200">
-<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01n8MZhZ1Z0xctYZEbM_!!87413133.jpg" width="200">
-<img src="https://img.alicdn.com/imgextra/i2/87413133/O1CN017vPSbK1Z0xcqoFn8E_!!87413133.jpg" width="200">
+忽略
 
 #### 六、请作者喝杯茶吧
-<img src="https://img.alicdn.com/imgextra/i3/87413133/O1CN01Ilrbqk1Z0xcwW5PsK_!!87413133.jpg" width="600">
+忽略
 
 #### 七、未来计划（二期计划6月1日之后重启项目）
 + 更换手机端UI为自定义UI
