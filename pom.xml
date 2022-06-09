@@ -112,8 +112,8 @@
             <groupId>com.q3z3</groupId>
             <artifactId>core-upload</artifactId>
             <version>${core.version}</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/lib/core-upload.jar</systemPath>
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${basedir}/src/main/resources/lib/core-upload.jar</systemPath>-->
         </dependency>
 
         <!--hutool -->
