@@ -112,8 +112,6 @@
             <groupId>com.q3z3</groupId>
             <artifactId>core-upload</artifactId>
             <version>${core.version}</version>
-<!--            <scope>system</scope>-->
-<!--            <systemPath>${basedir}/src/main/resources/lib/core-upload.jar</systemPath>-->
         </dependency>
 
         <!--hutool -->
@@ -206,9 +204,9 @@
 
     <repositories>
         <repository>
-            <id>q3z3-boot-temp-maven</id>
+            <id>q3z3-boot-tools-temp</id>
             <name>maven</name>
-            <url>https://q3z3-maven.pkg.coding.net/repository/boot-temp/maven/</url>
+            <url>https://q3z3-maven.pkg.coding.net/repository/boot-tools/temp/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
