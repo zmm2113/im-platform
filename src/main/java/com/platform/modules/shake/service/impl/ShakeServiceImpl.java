@@ -19,7 +19,7 @@ package com.platform.modules.shake.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.exception.BaseException;
 import com.platform.common.shiro.ShiroUtils;
 import com.platform.common.utils.redis.GeoHashUtils;
@@ -62,27 +62,23 @@ public class ShakeServiceImpl implements ShakeService {
         // 当前用户ID
         String userId = NumberUtil.toStr(ShiroUtils.getUserId());
         // 保存集合
-        redisUtils.lRightPush(ApiConstant.REDIS_SHAKE, userId);
+        redisUtils.lRightPush(AppConstants.REDIS_SHAKE, userId);
         // 保存经纬度
-        geoHashUtils.add(ApiConstant.REDIS_GEO, shakeVo.getLongitude(), shakeVo.getLatitude(), userId);
+        geoHashUtils.add(AppConstants.REDIS_GEO, shakeVo.getLongitude(), shakeVo.getLatitude(), userId);
     }
 
     private ShakeVo02 getShake() {
-        if (!redisUtils.hasKey(ApiConstant.REDIS_SHAKE)) {
+        if (!redisUtils.hasKey(AppConstants.REDIS_SHAKE)) {
             throw new BaseException(ERR_MSG);
         }
-        String userId = redisUtils.lLeftPop(ApiConstant.REDIS_SHAKE);
+        String userId = redisUtils.lLeftPop(AppConstants.REDIS_SHAKE);
         String current = NumberUtil.toStr(ShiroUtils.getUserId());
         if (current.equals(userId)) {
-            Long length = redisUtils.lLen(ApiConstant.REDIS_SHAKE);
-            if (length < 10) {
-                // 保存集合
-                redisUtils.lRightPush(ApiConstant.REDIS_SHAKE, current);
-            }
             throw new BaseException(ERR_MSG);
         }
+        redisUtils.lRightPush(AppConstants.REDIS_SHAKE, userId);
         ChatUser chatUser = ChatUser.initUser(chatUserService.getById(NumberUtil.parseLong(userId)));
-        Distance distance = geoHashUtils.dist(ApiConstant.REDIS_GEO, userId, current);
+        Distance distance = geoHashUtils.dist(AppConstants.REDIS_GEO, userId, current);
         return BeanUtil.toBean(chatUser, ShakeVo02.class)
                 .setDistance(distance.getValue())
                 .setDistanceUnit(distance.getUnit());

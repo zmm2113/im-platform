@@ -20,28 +20,27 @@ public class ShiroUtils {
         return (LoginUser) getSubject().getPrincipal();
     }
 
-    public static String getTokenId() {
+    /**
+     * 是否登录
+     */
+    public static boolean isLogin() {
+        return getLoginUser() != null;
+    }
+
+    public static String getToken() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null) {
-            return loginUser.getTokenId();
+            return loginUser.getToken();
         }
-        return ServletUtils.getRequest().getHeader(HeadConstant.TOKEN_KEY);
+        return ServletUtils.getRequest().getHeader(HeadConstant.TOKEN_HEADER_ADMIN);
     }
 
     public static String getPhone() {
-        LoginUser loginUser = getLoginUser();
-        if (loginUser != null) {
-            return loginUser.getPhone();
-        }
-        return null;
+        return getLoginUser().getPhone();
     }
 
     public static Long getUserId() {
-        LoginUser loginUser = getLoginUser();
-        if (loginUser != null) {
-            return loginUser.getUserId();
-        }
-        return null;
+        return getLoginUser().getUserId();
     }
 
 }

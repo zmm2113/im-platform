@@ -2,7 +2,7 @@ package com.platform.modules.chat.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.shiro.ShiroUtils;
 import com.platform.common.utils.redis.RedisUtils;
@@ -117,7 +117,7 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
                     || PushMsgTypeEnum.TRTC_VIDEO_START.equals(msgType)) {
                 chatVo04 = new ChatVo04()
                         .setUserId(friendId)
-                        .setTrtcId(ApiConstant.REDIS_TRTC_USER + friendId)
+                        .setTrtcId(AppConstants.REDIS_TRTC_USER + friendId)
                         .setPortrait(toUser.getPortrait())
                         .setNickName(friend1.getRemark());
             }
@@ -132,8 +132,10 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
                 .setCreateTime(DateUtil.date());
         this.add(chatMsg);
         // 推送
-        chatPushService.pushMsg(paramVo.setToId(friendId), msgType);
-        return doResult(MsgStatusEnum.NORMAL).setUserInfo(chatVo04);
+        chatPushService.pushMsg(paramVo.setToId(friendId).setMsgId(chatMsg.getId()), msgType);
+        return doResult(MsgStatusEnum.NORMAL)
+                .setMsgId(chatMsg.getId())
+                .setUserInfo(chatVo04);
     }
 
     /**
@@ -168,7 +170,7 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
                 .setCreateTime(DateUtil.date());
         this.add(chatMsg);
         // 查询群列表
-        List<PushParamVo> userList = groupService.queryFriendPushFrom(groupId, content);
+        List<PushParamVo> userList = groupService.queryFriendPushFrom(chatMsg);
         // 群信息
         PushParamVo groupUser = new PushParamVo()
                 .setUserId(group.getId())
@@ -176,12 +178,13 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
                 .setPortrait(group.getPortrait());
         // 推送
         chatPushService.pushMsg(userList, groupUser, chatVo.getMsgType());
-        return doResult(MsgStatusEnum.NORMAL);
+        return doResult(MsgStatusEnum.NORMAL)
+                .setMsgId(chatMsg.getId());
     }
 
     @Override
     public PushBodyVo getBigMsg(String msgId) {
-        String key = ApiConstant.REDIS_MSG_BIG + msgId;
+        String key = AppConstants.REDIS_MSG_BIG + msgId;
         if (!redisUtils.hasKey(key)) {
             return null;
         }

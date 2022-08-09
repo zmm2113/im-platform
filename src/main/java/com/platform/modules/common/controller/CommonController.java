@@ -1,5 +1,6 @@
 package com.platform.modules.common.controller;
 
+import com.platform.common.aspectj.IgnoreAuth;
 import com.platform.common.constant.HeadConstant;
 import com.platform.common.version.ApiVersion;
 import com.platform.common.version.VersionEnum;
@@ -27,6 +28,7 @@ public class CommonController {
     /**
      * 校验版本号
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @GetMapping("/getVersion")
     public AjaxResult getVersion(HttpServletRequest request) {
@@ -40,6 +42,7 @@ public class CommonController {
     /**
      * 用户协议
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @GetMapping("/getAgreement")
     public AjaxResult getAgreement() {

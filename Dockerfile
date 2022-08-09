@@ -11,7 +11,7 @@ VOLUME /tmp
 # 将jar包添加到容器中并更名为platform-admin.jar
 WORKDIR /data
 RUN mkdir logs
-ADD target/boot-im.jar platform-admin.jar
+ADD target/platform-api.jar platform-admin.jar
 # 修改时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -21,4 +21,4 @@ RUN echo -e "https://mirrors.ustc.edu.cn/alpine/v3.3/main" > /etc/apk/repositori
     && echo "https://mirrors.ustc.edu.cn/alpine/v3.3/community" >> /etc/apk/repositories \
     && apk add --update ttf-dejavu fontconfig && rm -rf /var/cache/apk/*
 # 运行jar包
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/data/platform-admin.jar", "--mpw.key=xxxxx"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/data/platform-admin.jar", "--mpw.key=fe48e54270ad9d48"]

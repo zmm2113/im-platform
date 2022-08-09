@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -48,7 +50,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
+    public static MappingJackson2HttpMessageConverter objectMapper() {
         final ObjectMapper objectMapper = new ObjectMapper();
         // 忽略未知的枚举字段
         objectMapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
@@ -73,9 +75,18 @@ public class ApplicationConfig {
                 jsonGenerator.writeString(DateUtil.format(date, DatePattern.NORM_DATETIME_FORMAT));
             }
         });
+        // 格式化金额
+        simpleModule.addSerializer(BigDecimal.class, new JsonSerializer<BigDecimal>() {
+            @Override
+            public void serialize(BigDecimal decimal, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+                jsonGenerator.writeString(decimal.setScale(2, BigDecimal.ROUND_HALF_DOWN).toString());
+            }
+        });
         // 注册 module
         objectMapper.registerModule(simpleModule);
-        return objectMapper;
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(objectMapper);
+        return converter;
     }
 
 }

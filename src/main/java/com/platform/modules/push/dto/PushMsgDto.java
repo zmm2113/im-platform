@@ -1,7 +1,6 @@
 package com.platform.modules.push.dto;
 
 import cn.hutool.core.lang.Dict;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.platform.modules.push.enums.PushClickTypeEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;

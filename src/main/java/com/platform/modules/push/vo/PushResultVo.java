@@ -20,4 +20,13 @@ public class PushResultVo {
      */
     private boolean online;
 
+    public static PushResultVo fail() {
+        return new PushResultVo();
+    }
+
+    public static PushResultVo success() {
+        return new PushResultVo()
+                .setResult(true)
+                .setOnline(true);
+    }
 }

@@ -18,6 +18,8 @@ server:
 
 # 项目相关配置
 platform:
+  # 富文本路径 示例（ Windows配置D:/platform/uploadPath，Linux配置 /home/platform/uploadPath）
+  rootPath: E:/platform/uploadPath
   # 系统版本
   version: 1.0.0
   # 日志地址
@@ -26,8 +28,6 @@ platform:
   timeout: 10080
   # 短信开关（N关Y开）
   sms: N
-  # 文件路径 示例（ Windows配置D:/platform/uploadPath，Linux配置 /home/platform/uploadPath）
-  uploadPath: E:/platform/uploadPath
 
 # oss配置
 oss:

@@ -13,6 +13,11 @@ import lombok.experimental.Accessors;
 public class PushParamVo {
 
     /**
+     * 消息id
+     */
+    private Long msgId;
+
+    /**
      * 用户id
      */
     private Long userId;

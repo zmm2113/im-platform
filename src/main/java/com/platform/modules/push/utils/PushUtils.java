@@ -73,20 +73,20 @@ public class PushUtils {
     /**
      * 设置alias
      */
-    public static void setAlias(PushTokenDto tokenDto, PushAliasVo aliasVo) {
-        setAlias(tokenDto, Arrays.asList(aliasVo));
+    public static void setAlias(PushTokenDto pushTokenDto, PushAliasVo aliasVo) {
+        setAlias(pushTokenDto, Arrays.asList(aliasVo));
     }
 
     /**
      * 设置alias
      */
-    public static void setAlias(PushTokenDto tokenDto, List<PushAliasVo> list) {
-        String url = formatUrl(tokenDto.getAppId(), USER_ALIAS);
+    public static void setAlias(PushTokenDto pushTokenDto, List<PushAliasVo> list) {
+        String url = formatUrl(pushTokenDto.getAppId(), USER_ALIAS);
         String body = JSONUtil.toJsonStr(Dict.create().set("data_list", list));
         String jsonStr = HttpUtil.createPost(url)
                 .body(body)
                 .setReadTimeout(TIMEOUT)
-                .header("token", tokenDto.getToken())
+                .header("token", pushTokenDto.getToken())
                 .execute()
                 .body();
         log.info(jsonStr);
@@ -95,20 +95,20 @@ public class PushUtils {
     /**
      * 解除alias
      */
-    public static void delAlias(PushTokenDto tokenDto, PushAliasVo aliasVo) {
-        delAlias(tokenDto, Arrays.asList(aliasVo));
+    public static void delAlias(PushTokenDto pushTokenDto, PushAliasVo aliasVo) {
+        delAlias(pushTokenDto, Arrays.asList(aliasVo));
     }
 
     /**
      * 解除alias
      */
-    public static void delAlias(PushTokenDto tokenDto, List<PushAliasVo> list) {
-        String url = formatUrl(tokenDto.getAppId(), USER_ALIAS);
+    public static void delAlias(PushTokenDto pushTokenDto, List<PushAliasVo> list) {
+        String url = formatUrl(pushTokenDto.getAppId(), USER_ALIAS);
         String body = JSONUtil.toJsonStr(Dict.create().set("data_list", list));
         String jsonStr = HttpUtil.createRequest(Method.DELETE, url)
                 .body(body)
                 .setReadTimeout(TIMEOUT)
-                .header("token", tokenDto.getToken())
+                .header("token", pushTokenDto.getToken())
                 .execute()
                 .body();
         log.info(jsonStr);
@@ -116,14 +116,12 @@ public class PushUtils {
 
     /**
      * 单推alias
-     *
-     * @return
      */
-    public static PushResultVo pushAlias(PushTokenDto tokenDto, PushMsgDto msgDto, Long userId) {
-        String url = formatUrl(tokenDto.getAppId(), PUSH_ALIAS_URL);
-        String body = JSONUtil.toJsonStr(initBody(msgDto, userId));
+    public static PushResultVo pushAlias(Long userId, PushMsgDto pushMsgDto, PushTokenDto pushTokenDto) {
+        String url = formatUrl(pushTokenDto.getAppId(), PUSH_ALIAS_URL);
+        String body = JSONUtil.toJsonStr(initBody(pushMsgDto, userId));
         String jsonStr = HttpUtil.createPost(url)
-                .header("token", tokenDto.getToken())
+                .header("token", pushTokenDto.getToken())
                 .body(body)
                 .timeout(TIMEOUT)
                 .execute()
@@ -137,15 +135,15 @@ public class PushUtils {
     /**
      * 组装推送对象
      */
-    private static Dict initBody(PushMsgDto msgDto, Long userId) {
+    private static Dict initBody(PushMsgDto pushMsgDto, Long userId) {
         Dict message = Dict.create();
         // 通知
-        if (msgDto.getTransmission() == null) {
-            message.set("notification", msgDto.setClick_type(msgDto.getClickType().getCode()));
+        if (pushMsgDto.getTransmission() == null) {
+            message.set("notification", pushMsgDto.setClick_type(pushMsgDto.getClickType().getCode()));
         }
         // 透传
         else {
-            message.set("transmission", JSONUtil.toJsonStr(msgDto.getTransmission()));
+            message.set("transmission", JSONUtil.toJsonStr(pushMsgDto.getTransmission()));
         }
         Dict dict = Dict.create()
                 .set("request_id", IdUtil.objectId())

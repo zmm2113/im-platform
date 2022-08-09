@@ -17,10 +17,9 @@
  */
 package com.platform.modules.auth.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.platform.common.config.PlatformConfig;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.HeadConstant;
 import com.platform.common.shiro.ShiroUtils;
 import com.platform.common.shiro.vo.LoginUser;
 import com.platform.common.utils.redis.RedisUtils;
@@ -41,34 +40,32 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken() {
-        String token = RandomUtil.randomString(32);
         LoginUser loginUser = ShiroUtils.getLoginUser();
-        // 设置token
-        loginUser.setTokenId(token);
-        String tokenPrefix = ApiConstant.TOKEN_APP;
-        Integer timeout = PlatformConfig.TIMEOUT;
+        String token = loginUser.getToken();
         // 存储redis
-        redisUtils.set(tokenPrefix + token, JSONUtil.toJsonStr(loginUser), timeout, TimeUnit.MINUTES);
+        redisUtils.set(makeToken(token), JSONUtil.toJsonStr(loginUser), PlatformConfig.TIMEOUT, TimeUnit.MINUTES);
         return token;
     }
 
     @Override
     public LoginUser queryByToken(String token) {
-        String key = ApiConstant.TOKEN_APP + token;
-        Integer timeout = PlatformConfig.TIMEOUT;
+        String key = makeToken(token);
         if (!redisUtils.hasKey(key)) {
             return null;
         }
         // 续期
-        redisUtils.expire(key, timeout, TimeUnit.MINUTES);
+        redisUtils.expire(key, PlatformConfig.TIMEOUT, TimeUnit.MINUTES);
         // 转换
         return JSONUtil.toBean(redisUtils.get(key), LoginUser.class);
     }
 
     @Override
     public void deleteToken(String token) {
-        String tokenPrefix = ApiConstant.TOKEN_APP;
-        redisUtils.delete(tokenPrefix.concat(token));
+        redisUtils.delete(makeToken(token));
+    }
+
+    private String makeToken(String token) {
+        return HeadConstant.TOKEN_REDIS_APP + token;
     }
 
 }

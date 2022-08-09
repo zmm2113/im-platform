@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Dict;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.web.service.BaseService;
 import com.platform.modules.chat.domain.ChatGroup;
+import com.platform.modules.chat.domain.ChatMsg;
 import com.platform.modules.chat.vo.GroupVo02;
 import com.platform.modules.chat.vo.GroupVo03;
 import com.platform.modules.chat.vo.GroupVo07;
@@ -88,7 +89,7 @@ public interface ChatGroupService extends BaseService<ChatGroup> {
     /**
      * 查询用户id
      */
-    List<PushParamVo> queryFriendPushFrom(Long groupId, String content);
+    List<PushParamVo> queryFriendPushFrom(ChatMsg chatMsg);
 
     /**
      * 查询用户id

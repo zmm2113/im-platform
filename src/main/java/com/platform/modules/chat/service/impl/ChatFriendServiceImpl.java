@@ -7,7 +7,7 @@ import cn.hutool.core.lang.PatternPool;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
 import com.platform.common.shiro.ShiroUtils;
@@ -90,7 +90,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 来源
         ApplySourceEnum sourceEnum = null;
         // 按扫码加好友
-        if (StrUtil.startWith(param, ApiConstant.QR_CODE_USER)) {
+        if (StrUtil.startWith(param, AppConstants.QR_CODE_USER)) {
             Long userId = Convert.toLong(ReUtil.get(PatternPool.NUMBERS, param, 0), null);
             chatUser = chatUserService.getById(userId);
             sourceEnum = ApplySourceEnum.SCAN;
@@ -192,8 +192,8 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 增加好友数据
         this.batchAdd(friendList);
         // 发送通知
-        chatPushService.pushMsg(ChatUser.initParam(fromUser).setContent(ApiConstant.NOTICE_FRIEND_CREATE).setToId(toId), PushMsgTypeEnum.ALERT);
-        chatPushService.pushMsg(ChatUser.initParam(toUser).setContent(ApiConstant.NOTICE_FRIEND_CREATE).setToId(fromId), PushMsgTypeEnum.ALERT);
+        chatPushService.pushMsg(ChatUser.initParam(fromUser).setContent(AppConstants.NOTICE_FRIEND_CREATE).setToId(toId), PushMsgTypeEnum.ALERT);
+        chatPushService.pushMsg(ChatUser.initParam(toUser).setContent(AppConstants.NOTICE_FRIEND_CREATE).setToId(fromId), PushMsgTypeEnum.ALERT);
     }
 
     /**
@@ -221,7 +221,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
             groupInfoService.updateById(new ChatGroupInfo().setInfoId(groupInfo.getInfoId()).setKicked(YesOrNoEnum.NO));
         }
         // 发送通知
-        String content = StrUtil.format(ApiConstant.NOTICE_GROUP_JOIN, fromUser.getNickName());
+        String content = StrUtil.format(AppConstants.NOTICE_GROUP_JOIN, fromUser.getNickName());
         List<PushParamVo> pushParamList = groupService.queryGroupPushFrom(groupId, null, content);
         chatPushService.pushMsg(pushParamList, PushMsgTypeEnum.ALERT);
     }
@@ -247,7 +247,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 校验是否是好友
         ChatFriend friend = getFriend(userId, friendId);
         if (friend == null) {
-            throw new BaseException(ApiConstant.FRIEND_NOT_EXIST);
+            throw new BaseException(AppConstants.FRIEND_NOT_EXIST);
         }
         this.updateById(new ChatFriend().setId(friend.getId()).setBlack(friendVo.getBlack()));
         // 移除缓存
@@ -261,7 +261,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 校验是否是好友
         ChatFriend friend = getFriend(userId, friendId);
         if (friend == null) {
-            throw new BaseException(ApiConstant.FRIEND_NOT_EXIST);
+            throw new BaseException(AppConstants.FRIEND_NOT_EXIST);
         }
         this.deleteById(friend.getId());
         // 移除缓存
@@ -275,7 +275,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 校验是否是好友
         ChatFriend friend = getFriend(userId, friendId);
         if (friend == null) {
-            throw new BaseException(ApiConstant.FRIEND_NOT_EXIST);
+            throw new BaseException(AppConstants.FRIEND_NOT_EXIST);
         }
         ChatFriend cf = new ChatFriend().setId(friend.getId()).setRemark(friendVo.getRemark());
         this.updateById(cf);
@@ -290,7 +290,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 校验是否是好友
         ChatFriend friend = getFriend(userId, friendId);
         if (friend == null) {
-            throw new BaseException(ApiConstant.FRIEND_NOT_EXIST);
+            throw new BaseException(AppConstants.FRIEND_NOT_EXIST);
         }
         this.updateById(new ChatFriend().setId(friend.getId()).setTop(friendVo.getTop()));
         // 移除缓存
@@ -378,7 +378,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         if (friend == null) {
             return null;
         }
-        redisUtils.set(key, JSONUtil.toJsonStr(friend), ApiConstant.REDIS_FRIEND_TIME, TimeUnit.DAYS);
+        redisUtils.set(key, JSONUtil.toJsonStr(friend), AppConstants.REDIS_FRIEND_TIME, TimeUnit.DAYS);
         return friend;
     }
 
@@ -391,7 +391,7 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
      * 生成好友缓存
      */
     private String makeFriendKey(Long userId, Long friendId) {
-        return StrUtil.format(ApiConstant.REDIS_FRIEND, userId, friendId);
+        return StrUtil.format(AppConstants.REDIS_FRIEND, userId, friendId);
     }
 
     /**

@@ -24,8 +24,6 @@ public class ShiroConfiguration {
 
     /**
      * 下面两个方法对 注解权限起作用有很大的关系，请把这两个方法，放在配置的最上面
-     *
-     * @return
      */
     @Bean(name = "lifecycleBeanPostProcessor")
     public static LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
@@ -35,8 +33,6 @@ public class ShiroConfiguration {
     /**
      * 身份认证Realm，此处的注入不可以缺少。否则会在UserRealm中注入对象会报空指针.
      * 将自己的验证方式加入容器
-     *
-     * @return
      */
     @Bean
     public ShiroRealm shiroRealm() {
@@ -47,8 +43,6 @@ public class ShiroConfiguration {
 
     /**
      * 配置shiro session 的一个管理器
-     *
-     * @return
      */
     @Bean
     public DefaultWebSessionManager sessionManager() {
@@ -60,8 +54,6 @@ public class ShiroConfiguration {
     /**
      * 核心的安全事务管理器
      * 设置realm、cacheManager等
-     *
-     * @return
      */
     @Bean
     public SecurityManager securityManager() {
@@ -76,8 +68,6 @@ public class ShiroConfiguration {
     /**
      * 开启shiro aop注解支持.
      * 使用代理方式;所以需要开启代码支持;否则@RequiresRoles等注解无法生效
-     *
-     * @return
      */
     @Bean
     public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
@@ -89,8 +79,6 @@ public class ShiroConfiguration {
     /**
      * 哈希密码比较器。在myShiroRealm中作用参数使用
      * 登陆时会比较用户输入的密码，跟数据库密码配合盐值salt解密后是否一致。
-     *
-     * @return
      */
     @Bean
     public HashedCredentialsMatcher hashedCredentialsMatcher() {
@@ -111,14 +99,9 @@ public class ShiroConfiguration {
         shiroFilterFactoryBean.setFilters(filters);
         //权限控制map
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
-        // 配置不会被拦截的链接 顺序判断
-        filterChainDefinitionMap.put("/favicon.ico", "anon");// 网页图标
-        // 自定义拦截全部写到下面↓↓↓↓↓
-        filterChainDefinitionMap.put("/auth/**", "anon");// 认证
-        filterChainDefinitionMap.put("/common/**", "anon");// 公共模块
-        // TODO
-        filterChainDefinitionMap.put("/test/**", "anon");// 测试模块
-        // 自定义拦截全部写到上面↑↑↑↑↑
+        // 自定义拦截全部写到下面↓↓↓
+        // 免登录接口，增加@IgnoreAuth注解
+        // 自定义拦截全部写到上面↑↑↑
         filterChainDefinitionMap.put("/**", "oauth2");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;

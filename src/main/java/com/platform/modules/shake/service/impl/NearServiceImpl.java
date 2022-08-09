@@ -19,7 +19,7 @@ package com.platform.modules.shake.service.impl;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.shiro.ShiroUtils;
 import com.platform.common.utils.redis.GeoHashUtils;
 import com.platform.common.utils.redis.GeoVo;
@@ -59,21 +59,21 @@ public class NearServiceImpl implements NearService {
     @Override
     public void closeNear() {
         String userId = NumberUtil.toStr(ShiroUtils.getUserId());
-        geoHashUtils.remove(ApiConstant.REDIS_NEAR, userId);
+        geoHashUtils.remove(AppConstants.REDIS_NEAR, userId);
     }
 
     private void sendNear(NearVo01 nearVo) {
         // 当前用户ID
         String userId = NumberUtil.toStr(ShiroUtils.getUserId());
         // 保存坐标
-        geoHashUtils.add(ApiConstant.REDIS_NEAR, nearVo.getLongitude(), nearVo.getLatitude(), userId);
+        geoHashUtils.add(AppConstants.REDIS_NEAR, nearVo.getLongitude(), nearVo.getLatitude(), userId);
     }
 
     private List<NearVo02> getNear() {
         // 当前用户
         String userId = NumberUtil.toStr(ShiroUtils.getUserId());
-        // 100公里内的9999个用户
-        List<GeoResult<GeoVo>> geoResults = geoHashUtils.radius(ApiConstant.REDIS_NEAR, userId, 100, 9999);
+        // 1000公里内的9999个用户
+        List<GeoResult<GeoVo>> geoResults = geoHashUtils.radius(AppConstants.REDIS_NEAR, userId, 1000, 9999);
         // 过滤
         List<String> userList = new ArrayList<>();
         List<NearVo02> dataList = geoResults.stream().collect(ArrayList::new, (x, y) -> {

@@ -1,7 +1,8 @@
 package com.platform.modules.auth.controller;
 
 import cn.hutool.core.lang.Dict;
-import com.platform.common.aspectj.annotation.SubmitRepeat;
+import com.platform.common.aspectj.IgnoreAuth;
+import com.platform.common.aspectj.SubmitRepeat;
 import com.platform.common.exception.BaseException;
 import com.platform.common.shiro.ShiroLoginAuth;
 import com.platform.common.shiro.ShiroLoginPhone;
@@ -43,21 +44,19 @@ public class AuthController extends BaseController {
 
     /**
      * 发送验证码（登录/注册/忘记密码）
-     *
-     * @return 结果
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping(value = "/sendCode")
     @SubmitRepeat
     public AjaxResult sendCode(@Validated @RequestBody SmsVo smsVo) {
-        return AjaxResult.success(smsService.sendSms(smsVo), "验证码已发送");
+        return AjaxResult.success(smsService.sendSms(smsVo)).put("msg", "验证码已发送");
     }
 
     /**
      * 注册方法
-     *
-     * @return 结果
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping(value = "/register")
     public AjaxResult register(@Validated @RequestBody AuthVo01 authVo) {
@@ -70,9 +69,8 @@ public class AuthController extends BaseController {
 
     /**
      * 登录方法（根据手机+密码登录）
-     *
-     * @return 结果
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/login")
     public AjaxResult login(@Validated @RequestBody AuthVo02 authVo) {
@@ -84,9 +82,8 @@ public class AuthController extends BaseController {
 
     /**
      * 登录方法（根据手机+验证码登录）
-     *
-     * @return 结果
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/loginByCode")
     public AjaxResult loginByCode(@Validated @RequestBody AuthVo03 authVo) {
@@ -100,9 +97,8 @@ public class AuthController extends BaseController {
 
     /**
      * 找回密码（根据手机）
-     *
-     * @return 结果
      */
+    @IgnoreAuth
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/forget")
     public AjaxResult forget(@Validated @RequestBody AuthVo04 authVo) {

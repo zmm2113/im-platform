@@ -4,10 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.exception.BaseException;
-import com.platform.common.upload.config.UploadFileConfig;
-import com.platform.common.upload.utils.BaseFileUtils;
+import com.platform.common.upload.config.UploadConfig;
+import com.platform.common.upload.utils.BaseUtils;
 import com.platform.common.upload.utils.OssUtils;
 import com.platform.common.upload.vo.UploadAudioVo;
 import com.platform.common.upload.vo.UploadFileVo;
@@ -38,7 +38,7 @@ public class FileServiceImpl implements FileService {
             throw new BaseException(StrUtil.format("暂不支持{}格式上传", fileType));
         }
         // 初始化
-        BaseFileUtils.init(BeanUtil.toBean(ossConfig, UploadFileConfig.class));
+        BaseUtils.init(BeanUtil.toBean(ossConfig, UploadConfig.class));
         // 上传
         return OssUtils.uploadFile(file);
     }
@@ -46,17 +46,17 @@ public class FileServiceImpl implements FileService {
     @Override
     public UploadVideoVo uploadVideo(MultipartFile videoFile) {
         // 初始化
-        BaseFileUtils.init(BeanUtil.toBean(ossConfig, UploadFileConfig.class));
+        BaseUtils.init(BeanUtil.toBean(ossConfig, UploadConfig.class));
         // 上传视频文件
         UploadFileVo videoFileVo = OssUtils.uploadFile(videoFile);
         return BeanUtil.toBean(videoFileVo, UploadVideoVo.class)
-                .setScreenShot(videoFileVo.getFullPath() + ApiConstant.VIDEO_PARAM);
+                .setScreenShot(videoFileVo.getFullPath() + AppConstants.VIDEO_PARAM);
     }
 
     @Override
     public UploadAudioVo uploadAudio(MultipartFile audioFile) {
         // 初始化
-        BaseFileUtils.init(BeanUtil.toBean(ossConfig, UploadFileConfig.class));
+        BaseUtils.init(BeanUtil.toBean(ossConfig, UploadConfig.class));
         // 上传音频文件
         UploadFileVo audioFileVo = OssUtils.uploadFile(audioFile);
         String data;

@@ -3,7 +3,7 @@ package com.platform.modules.chat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.exception.BaseException;
 import com.platform.common.shiro.ShiroUtils;
 import com.platform.common.utils.redis.RedisUtils;
@@ -117,7 +117,7 @@ public class ChatApplyServiceImpl extends BaseServiceImpl<ChatApply> implements 
     public PageInfo list() {
         Long userId = ShiroUtils.getUserId();
         // 清空角标
-        redisUtils.delete(ApiConstant.REDIS_FRIEND_NOTICE + userId);
+        redisUtils.delete(AppConstants.REDIS_FRIEND_NOTICE + userId);
         // 查询
         List<ChatApply> dataList = queryList(new ChatApply().setToId(userId));
         // 获取申请人

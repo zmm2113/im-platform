@@ -13,7 +13,7 @@ import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import cn.hutool.http.HttpUtil;
 import com.platform.common.config.PlatformConfig;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.constant.HeadConstant;
 import com.platform.common.enums.GenderEnum;
 import com.platform.common.enums.YesOrNoEnum;
@@ -97,7 +97,7 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
                 .setNickName(nickName)
                 .setChatNo(chatNo)
                 .setGender(GenderEnum.MALE)
-                .setPortrait(ApiConstant.DEFAULT_PORTRAIT)
+                .setPortrait(AppConstants.DEFAULT_PORTRAIT)
                 .setSalt(salt)
                 .setPhone(phone)
                 .setPassword(Md5Utils.credentials(password, salt))
@@ -168,7 +168,7 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
 
     @Override
     public String getQrCode() {
-        String key = ApiConstant.REDIS_QR_CODE + ShiroUtils.getUserId();
+        String key = AppConstants.REDIS_QR_CODE + ShiroUtils.getUserId();
         if (redisUtils.hasKey(key)) {
             return redisUtils.get(key);
         }
@@ -179,14 +179,14 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
     public String resetQrCode() {
         Long userId = ShiroUtils.getUserId();
         ChatUser chatUser = getById(userId);
-        String content = ApiConstant.QR_CODE_USER + userId;
-        File original = HttpUtil.downloadFileFromUrl(chatUser.getPortrait() + ApiConstant.IMAGE_PARAM, FileUtil.file(PlatformConfig.UPLOAD_PATH));
-        QrConfig qrConfig = QrConfig.create().setWidth(ApiConstant.QR_CODE_SIZE).setHeight(ApiConstant.QR_CODE_SIZE).setImg(original);
+        String content = AppConstants.QR_CODE_USER + userId;
+        File original = HttpUtil.downloadFileFromUrl(chatUser.getPortrait() + AppConstants.IMAGE_PARAM, FileUtil.file(PlatformConfig.ROOT_PATH));
+        QrConfig qrConfig = QrConfig.create().setWidth(AppConstants.QR_CODE_SIZE).setHeight(AppConstants.QR_CODE_SIZE).setImg(original);
         byte[] data = QrCodeUtil.generatePng(content, qrConfig);
         // 删除临时图片
         FileUtil.del(original);
-        String value = ApiConstant.BASE64_PREFIX.concat(Base64.encode(data));
-        redisUtils.set(ApiConstant.REDIS_QR_CODE + userId, value, ApiConstant.REDIS_QR_CODE_TIME, TimeUnit.DAYS);
+        String value = AppConstants.BASE64_PREFIX.concat(Base64.encode(data));
+        redisUtils.set(AppConstants.REDIS_QR_CODE + userId, value, AppConstants.REDIS_QR_CODE_TIME, TimeUnit.DAYS);
         return value;
     }
 
@@ -226,13 +226,24 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
         }
         // 生成新TOKEN
         token = tokenService.generateToken();
-        // 更新token
         String version = ServletUtils.getRequest().getHeader(HeadConstant.VERSION);
-        this.updateById(new ChatUser().setCid(cid).setToken(token).setUserId(userId).setVersion(version));
-        // 注册别名
-        chatPushService.setAlias(userId, cid);
+        ChatUser chatUser = new ChatUser()
+                .setUserId(userId)
+                .setToken(token)
+                .setVersion(version);
+        if (!StringUtils.isEmpty(cid)) {
+            // 注册别名
+            chatPushService.setAlias(userId, cid);
+            // 更新cid
+            chatUser.setCid(cid);
+        }
+        // 更新token
+        this.updateById(chatUser);
         // 拉取离线消息
-        chatPushService.pullOffLine(userId);
+        String device = ServletUtils.getRequest().getHeader(HeadConstant.DEVICE);
+        if (HeadConstant.DEVICE_IOS.equals(device) || HeadConstant.DEVICE_ANDROID.equals(device)) {
+            chatPushService.pullOffLine(userId);
+        }
         return Dict.create().set("token", token);
     }
 
@@ -287,9 +298,9 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
         }
         String userStr = NumberUtil.toStr(userId);
         // 附近的人
-        geoHashUtils.remove(ApiConstant.REDIS_NEAR, userStr);
+        geoHashUtils.remove(AppConstants.REDIS_NEAR, userStr);
         // 摇一摇
-        redisUtils.lRemove(ApiConstant.REDIS_SHAKE, 0, userStr);
+        redisUtils.lRemove(AppConstants.REDIS_SHAKE, 0, userStr);
     }
 
 }

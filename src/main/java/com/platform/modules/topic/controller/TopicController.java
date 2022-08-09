@@ -8,7 +8,6 @@ import com.platform.common.web.domain.AjaxResult;
 import com.platform.common.web.page.TableDataInfo;
 import com.platform.modules.chat.domain.ChatUser;
 import com.platform.modules.chat.service.ChatUserService;
-import com.platform.modules.topic.service.ChatTopicReplyService;
 import com.platform.modules.topic.service.ChatTopicService;
 import com.platform.modules.topic.vo.TopicVo01;
 import com.platform.modules.topic.vo.TopicVo02;
@@ -29,9 +28,6 @@ public class TopicController extends BaseController {
 
     @Resource
     private ChatTopicService topicService;
-
-    @Resource
-    private ChatTopicReplyService chatTopicReplyService;
 
     @Resource
     private ChatUserService chatUserService;

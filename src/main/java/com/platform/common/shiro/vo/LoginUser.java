@@ -1,22 +1,19 @@
 package com.platform.common.shiro.vo;
 
-import com.platform.modules.chat.domain.ChatUser;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
+import lombok.experimental.Accessors;
 
 /**
  * 登录用户身份权限
  */
 @Data
-@NoArgsConstructor
+@Accessors(chain = true) // 链式调用
 public class LoginUser {
 
     /**
      * 用户唯一标识
      */
-    private String tokenId;
+    private String token;
 
     /**
      * 用户ID
@@ -29,45 +26,8 @@ public class LoginUser {
     private String phone;
 
     /**
-     * 权限列表
-     */
-    private List<String> permissions;
-
-    /**
-     * 角色key
-     */
-    private String roleKey;
-
-    /**
-     * 登陆时间
-     */
-    private String loginTime;
-
-    /**
      * 登录IP地址
      */
     private String ipAddr;
-
-    /**
-     * 登录地点
-     */
-    private String loginLocation;
-
-    /**
-     * 浏览器类型
-     */
-    private String browser;
-
-    /**
-     * 操作系统
-     */
-    private String os;
-
-    public LoginUser(ChatUser chatUser, String roleKey, List<String> permissions) {
-        this.userId = chatUser.getUserId();
-        this.phone = chatUser.getPhone();
-        this.roleKey = roleKey;
-        this.permissions = permissions;
-    }
 
 }

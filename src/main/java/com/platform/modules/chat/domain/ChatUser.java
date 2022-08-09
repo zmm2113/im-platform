@@ -1,7 +1,7 @@
 package com.platform.modules.chat.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.GenderEnum;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.web.domain.BaseEntity;
@@ -113,8 +113,8 @@ public class ChatUser extends BaseEntity {
         }
         return new ChatUser()
                 .setGender(GenderEnum.MALE)
-                .setPortrait(ApiConstant.DELETED_PORTRAIT)
-                .setNickName(ApiConstant.DELETED_NICK_NAME)
+                .setPortrait(AppConstants.DELETED_PORTRAIT)
+                .setNickName(AppConstants.DELETED_NICK_NAME)
                 .setStatus(YesOrNoEnum.NO);
     }
 

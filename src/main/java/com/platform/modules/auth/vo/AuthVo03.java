@@ -22,7 +22,6 @@ public class AuthVo03 {
     /**
      * 推送ID
      */
-    @NotBlank(message = "推送ID不能为空")
     private String cid;
 
 }

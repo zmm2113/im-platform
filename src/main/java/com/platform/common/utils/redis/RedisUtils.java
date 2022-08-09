@@ -1371,4 +1371,14 @@ public class RedisUtils {
         return redisTemplate.opsForZSet().scan(key, options);
     }
 
+    /**
+     * 发布订阅
+     *
+     * @param channel
+     * @param message
+     */
+    public void convertAndSend(String channel, Object message) {
+        redisTemplate.convertAndSend(channel, message);
+    }
+
 }

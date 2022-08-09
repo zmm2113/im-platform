@@ -8,7 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.HMac;
 import cn.hutool.crypto.digest.HmacAlgorithm;
 import cn.hutool.json.JSONUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.shiro.ShiroUtils;
 import com.platform.common.utils.redis.RedisUtils;
 import com.platform.modules.common.config.TrtcConfig;
@@ -32,11 +32,11 @@ public class TrtcServiceImpl implements TrtcService {
 
     @Override
     public TrtcVo getSign() {
-        String key = ApiConstant.REDIS_TRTC_SIGN + ShiroUtils.getUserId();
+        String key = AppConstants.REDIS_TRTC_SIGN + ShiroUtils.getUserId();
         if (redisUtils.hasKey(key)) {
             return JSONUtil.toBean(redisUtils.get(key), TrtcVo.class);
         }
-        String userId = ApiConstant.REDIS_TRTC_USER + ShiroUtils.getUserId();
+        String userId = AppConstants.REDIS_TRTC_USER + ShiroUtils.getUserId();
         long currTime = DateUtil.currentSeconds();
         Dict doc = Dict.create()
                 .set("TLS.ver", "2.0")

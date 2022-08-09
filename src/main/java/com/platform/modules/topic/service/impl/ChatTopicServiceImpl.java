@@ -6,7 +6,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
 import com.platform.common.shiro.ShiroUtils;
@@ -38,7 +38,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -208,8 +209,8 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
     public List<TopicVo09> queryNoticeList() {
         Long userId = ShiroUtils.getUserId();
         // 清空通知数
-        redisUtils.delete(ApiConstant.REDIS_TOPIC_NOTICE + userId);
-        String key = ApiConstant.REDIS_TOPIC_REPLY + userId;
+        redisUtils.delete(AppConstants.REDIS_TOPIC_NOTICE + userId);
+        String key = AppConstants.REDIS_TOPIC_REPLY + userId;
         if (!redisUtils.hasKey(key)) {
             return new ArrayList<>();
         }
@@ -223,7 +224,7 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
 
     @Override
     public void clearNotice() {
-        String key = ApiConstant.REDIS_TOPIC_REPLY + ShiroUtils.getUserId();
+        String key = AppConstants.REDIS_TOPIC_REPLY + ShiroUtils.getUserId();
         redisUtils.delete(key);
     }
 
@@ -418,7 +419,7 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
                     .setPortrait(fromUser.getPortrait())
                     .setReplyContent(content)
                     .setReplyTime(DateUtil.date());
-            redisUtils.lLeftPush(ApiConstant.REDIS_TOPIC_REPLY + userId, JSONUtil.toJsonStr(topicVo));
+            redisUtils.lLeftPush(AppConstants.REDIS_TOPIC_REPLY + userId, JSONUtil.toJsonStr(topicVo));
         });
     }
 

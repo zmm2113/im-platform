@@ -3,7 +3,7 @@ package com.platform.modules.chat.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
 import com.platform.common.utils.redis.RedisUtils;
@@ -49,7 +49,7 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
 
     @Override
     public ChatGroupInfo getGroupInfo(Long groupId, Long userId, YesOrNoEnum verify) {
-        String key = StrUtil.format(ApiConstant.REDIS_GROUP_INFO, groupId, userId);
+        String key = StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, userId);
         ChatGroupInfo info;
         // 缓存存在
         if (redisUtils.hasKey(key)) {
@@ -57,7 +57,7 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
         }
         // 缓存不存在
         else if ((info = this.queryOne(new ChatGroupInfo().setUserId(userId).setGroupId(groupId))) != null) {
-            redisUtils.set(key, JSONUtil.toJsonStr(info), ApiConstant.REDIS_GROUP_TIME, TimeUnit.DAYS);
+            redisUtils.set(key, JSONUtil.toJsonStr(info), AppConstants.REDIS_GROUP_TIME, TimeUnit.DAYS);
         }
         if (YesOrNoEnum.NO.equals(verify)) {
             return info;
@@ -74,7 +74,7 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
     @Override
     public void delGroupInfoCache(Long groupId, List<Long> userList) {
         userList.forEach(e -> {
-            redisUtils.delete(StrUtil.format(ApiConstant.REDIS_GROUP_INFO, groupId, e));
+            redisUtils.delete(StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, e));
         });
     }
 
@@ -110,9 +110,9 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
     public void delByGroup(Long groupId) {
         chatGroupInfoDao.delete(new QueryWrapper<>(new ChatGroupInfo().setGroupId(groupId)));
         // 删除群二维码
-        redisUtils.delete(ApiConstant.REDIS_QR_CODE + groupId);
+        redisUtils.delete(AppConstants.REDIS_QR_CODE + groupId);
         // 删除群成员
-        String key = StrUtil.format(ApiConstant.REDIS_GROUP_INFO, groupId, "*");
+        String key = StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, "*");
         redisUtils.delete(key);
     }
 

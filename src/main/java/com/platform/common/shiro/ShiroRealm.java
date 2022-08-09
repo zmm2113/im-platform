@@ -1,17 +1,13 @@
 package com.platform.common.shiro;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.http.useragent.UserAgent;
-import cn.hutool.http.useragent.UserAgentUtil;
-import com.platform.common.constant.ApiConstant;
+import cn.hutool.core.util.RandomUtil;
 import com.platform.common.enums.ResultCodeEnum;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.LoginException;
 import com.platform.common.shiro.utils.Md5Utils;
 import com.platform.common.shiro.vo.LoginUser;
+import com.platform.common.utils.IpUtils;
 import com.platform.common.utils.ServletUtils;
-import com.platform.common.utils.ip.AddressUtils;
-import com.platform.common.utils.ip.IpUtils;
 import com.platform.modules.auth.service.TokenService;
 import com.platform.modules.chat.domain.ChatUser;
 import com.platform.modules.chat.service.ChatUserService;
@@ -27,7 +23,6 @@ import org.apache.shiro.util.ByteSource;
 import org.springframework.context.annotation.Lazy;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 
 /**
  * ShiroRealm
@@ -44,9 +39,6 @@ public class ShiroRealm extends AuthorizingRealm {
 
     /**
      * 提供用户信息，返回权限信息
-     *
-     * @param principals
-     * @return
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -56,12 +48,7 @@ public class ShiroRealm extends AuthorizingRealm {
         }
         // 后台管理
         if (object instanceof LoginUser) {
-            LoginUser loginUser = (LoginUser) object;
             SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-            // 添加角色
-            info.addRole(loginUser.getRoleKey());
-            // 添加权限
-            info.addStringPermissions(loginUser.getPermissions());
             return info;
         }
         return null;
@@ -80,10 +67,6 @@ public class ShiroRealm extends AuthorizingRealm {
 
     /**
      * 身份认证/登录，验证用户是不是拥有相应的身份； 用于登陆认证
-     *
-     * @param authenticationToken
-     * @return
-     * @throws AuthenticationException
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
@@ -115,8 +98,6 @@ public class ShiroRealm extends AuthorizingRealm {
 
     /**
      * 组装登录对象
-     *
-     * @return
      */
     private SimpleAuthenticationInfo makeLoginUser(String phone, boolean isPassword) {
         // 查询用户
@@ -129,9 +110,11 @@ public class ShiroRealm extends AuthorizingRealm {
             throw new LoginException("手机号已停用"); // 手机禁用
         }
         // 查询权限
-        LoginUser loginUser = new LoginUser(chatUser, ApiConstant.ROLE_KEY, Arrays.asList(ApiConstant.PERM_APP));
-        // 设置代理信息
-        makeUserAgent(loginUser);
+        LoginUser loginUser = new LoginUser()
+                .setUserId(chatUser.getUserId())
+                .setPhone(chatUser.getPhone())
+                .setIpAddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
+                .setToken(RandomUtil.randomString(32));
         String credentials = chatUser.getPassword();
         String salt = chatUser.getSalt();
         if (!isPassword) {
@@ -142,26 +125,6 @@ public class ShiroRealm extends AuthorizingRealm {
         }
         // 登录
         return new SimpleAuthenticationInfo(loginUser, credentials, ByteSource.Util.bytes(salt), getName());
-    }
-
-    /**
-     * 设置用户代理信息
-     *
-     * @param loginUser 登录信息
-     */
-    private void makeUserAgent(LoginUser loginUser) {
-        UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
-        String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
-        // 登录ip
-        loginUser.setIpAddr(ip);
-        // 登录地点
-        loginUser.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
-        // 浏览器类型
-        loginUser.setBrowser(userAgent.getBrowser().getName());
-        // 操作系统
-        loginUser.setOs(userAgent.getOs().getName());
-        // 登录时间
-        loginUser.setLoginTime(DateUtil.now());
     }
 
     @Override

@@ -16,6 +16,16 @@ import org.springframework.stereotype.Component;
 public class PlatformConfig {
 
     /**
+     * 上传路径
+     */
+    public static String ROOT_PATH;
+
+    /**
+     * 文件预览
+     */
+    public static String PREVIEW = "/preview/";
+
+    /**
      * token超时时间（分钟）
      */
     public static Integer TIMEOUT;
@@ -24,11 +34,6 @@ public class PlatformConfig {
      * 是否开启短信
      */
     public static YesOrNoEnum SMS;
-
-    /**
-     * 上传路径
-     */
-    public static String UPLOAD_PATH;
 
     @Value("${platform.timeout}")
     public void setTokenTimeout(Integer timeout) {
@@ -40,9 +45,9 @@ public class PlatformConfig {
         PlatformConfig.SMS = EnumUtils.toEnum(YesOrNoEnum.class, sms, YesOrNoEnum.NO);
     }
 
-    @Value("${platform.uploadPath}")
-    public void setUploadPath(String uploadPath) {
-        PlatformConfig.UPLOAD_PATH = uploadPath;
+    @Value("${platform.rootPath}")
+    public void setRootPath(String rootPath) {
+        PlatformConfig.ROOT_PATH = rootPath;
     }
 
 }

@@ -14,6 +14,11 @@ public class ChatVo03 {
     private MsgStatusEnum status;
 
     /**
+     * 消息id
+     */
+    private Long msgId;
+
+    /**
      * 好友详情
      */
     private ChatVo04 userInfo;

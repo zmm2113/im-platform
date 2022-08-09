@@ -6,7 +6,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.platform.common.constant.ApiConstant;
+import com.platform.common.constant.AppConstants;
 import com.platform.common.exception.BaseException;
 import com.platform.common.utils.redis.RedisUtils;
 import com.platform.modules.chat.config.AmapConfig;
@@ -26,8 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Service("chatWeatherService")
 public class ChatWeatherServiceImpl implements ChatWeatherService {
 
-    // 文档地址
-    // https://lbs.amap.com/api/webservice/guide/api/weatherinfo
+    // 文档地址 https://lbs.amap.com/api/webservice/guide/api/weatherinfo
 
     /**
      * 接口地址
@@ -56,7 +55,7 @@ public class ChatWeatherServiceImpl implements ChatWeatherService {
     }
 
     private JSONArray doQuery(String city, String extensions) {
-        String key = StrUtil.format(ApiConstant.REDIS_MP_WEATHER, city, extensions);
+        String key = StrUtil.format(AppConstants.REDIS_MP_WEATHER, city, extensions);
         if (redisUtils.hasKey(key)) {
             return JSONUtil.parseArray(redisUtils.get(key));
         }
@@ -67,7 +66,7 @@ public class ChatWeatherServiceImpl implements ChatWeatherService {
             throw new BaseException("天气接口异常，请稍后再试");
         }
         JSONArray jsonArray = jsonObject.getJSONArray(EXT_BASE.equals(extensions) ? "lives" : "forecasts");
-        redisUtils.set(key, JSONUtil.toJsonStr(jsonArray), ApiConstant.REDIS_MP_WEATHER_TIME, TimeUnit.MINUTES);
+        redisUtils.set(key, JSONUtil.toJsonStr(jsonArray), AppConstants.REDIS_MP_WEATHER_TIME, TimeUnit.MINUTES);
         return jsonArray;
     }
 

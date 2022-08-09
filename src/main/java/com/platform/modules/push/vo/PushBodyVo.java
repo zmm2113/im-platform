@@ -45,8 +45,8 @@ public class PushBodyVo {
      */
     private PushToVo groupInfo;
 
-    public PushBodyVo(String msgId, PushBodyTypeEnum pushType, Object data) {
-        this.msgId = msgId;
+    public PushBodyVo(Long msgId, PushBodyTypeEnum pushType, Object data) {
+        this.msgId = String.valueOf(msgId);
         this.pushType = pushType.getCode();
         this.msgContent = data;
         this.createTime = DateUtil.format(DateUtil.date(), DatePattern.NORM_DATETIME_FORMAT);
