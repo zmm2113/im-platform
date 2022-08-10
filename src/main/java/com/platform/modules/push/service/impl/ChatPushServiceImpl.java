@@ -125,6 +125,9 @@ public class ChatPushServiceImpl implements ChatPushService {
             pushMsgVo.setDisturb(disturb.getCode());
         }
         Long msgId = from.getMsgId();
+        if (msgId == null) {
+            msgId = SnowflakeUtils.getNextId();
+        }
         PushBodyVo pushBodyVo = new PushBodyVo(msgId, PushBodyTypeEnum.MSG, pushMsgVo);
         // 发送人
         pushBodyVo.setFromInfo(BeanUtil.toBean(from, PushFromVo.class).setUserType(from.getUserType().getCode()));

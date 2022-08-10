@@ -578,7 +578,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
     private List<PushParamVo> formatFrom(List<Long> userList, PushParamVo paramVo) {
         List<PushParamVo> paramList = new ArrayList<>();
         userList.forEach(e -> {
-            paramList.add(paramVo.setToId(e));
+            paramList.add(BeanUtil.toBean(paramVo, PushParamVo.class).setToId(e));
         });
         return paramList;
     }
