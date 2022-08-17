@@ -216,7 +216,7 @@
 
     <repositories>
         <repository>
-            <id>q3z3-boot-tools-maven</id>tools
+            <id>q3z3-boot-tools-maven</id>
             <name>maven</name>
             <url>https://q3z3-maven.pkg.coding.net/repository/boot-tools/maven/</url>
             <releases>
