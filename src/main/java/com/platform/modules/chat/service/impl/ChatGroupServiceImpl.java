@@ -539,16 +539,13 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         Long groupId = groupVo.getGroupId();
         ChatUser chatUser = chatUserService.getById(userId);
         groupInfoService.getGroupInfo(groupId, userId, YesOrNoEnum.YES);
-        ChatGroup group = new ChatGroup()
-                .setId(groupId)
-                .setName(groupVo.getName());
-        updateById(group);
-        String groupName = formatGroupName(groupId, group.getName());
+        updateById(new ChatGroup().setId(groupId).setName(groupVo.getName()));
+        String groupName = formatGroupName(groupId, groupVo.getName());
         PushParamVo paramVo = new PushParamVo()
-                .setUserId(group.getId())
+                .setUserId(groupId)
                 .setNickName(groupName)
-                .setPortrait(group.getPortrait())
-                .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_EDIT, chatUser.getNickName(), group.getName()));
+                .setPortrait(getById(groupId).getPortrait())
+                .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_EDIT, chatUser.getNickName(), groupVo.getName()));
         // 通知组员
         List<Long> userList = groupInfoService.queryUserList(groupId);
         chatPushService.pushMsg(formatFrom(userList, paramVo), paramVo, PushMsgTypeEnum.ALERT);
