@@ -1,6 +1,5 @@
 package com.platform.modules.chat.service.impl;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
@@ -33,26 +32,12 @@ public class ChatWeatherServiceImpl implements ChatWeatherService {
      */
     private final static String URL = "https://restapi.amap.com/v3/weather/weatherInfo?city=CITY&&key=KEY&extensions=EXT";
     private final static String EXT_BASE = "base";
-    private final static String EXT_ALL = "all";
-
 
     @Autowired
     private AmapConfig amapConfig;
 
     @Autowired
     private RedisUtils redisUtils;
-
-    @Override
-    public Dict queryBase(String cityCode) {
-        JSONArray jsonArray = doQuery(cityCode, EXT_BASE);
-        return Dict.create().parseBean(jsonArray.get(0));
-    }
-
-    @Override
-    public Dict queryPredict(String cityCode) {
-        JSONArray jsonArray = doQuery(cityCode, EXT_ALL);
-        return Dict.create().parseBean(jsonArray.get(0));
-    }
 
     private JSONArray doQuery(String city, String extensions) {
         String key = StrUtil.format(AppConstants.REDIS_MP_WEATHER, city, extensions);
@@ -66,6 +51,9 @@ public class ChatWeatherServiceImpl implements ChatWeatherService {
             throw new BaseException("天气接口异常，请稍后再试");
         }
         JSONArray jsonArray = jsonObject.getJSONArray(EXT_BASE.equals(extensions) ? "lives" : "forecasts");
+        if ("[[]]".equals(jsonArray.toString())) {
+            return new JSONArray();
+        }
         redisUtils.set(key, JSONUtil.toJsonStr(jsonArray), AppConstants.REDIS_MP_WEATHER_TIME, TimeUnit.MINUTES);
         return jsonArray;
     }

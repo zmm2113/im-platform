@@ -192,7 +192,10 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
             }
             // 更新
             else if (YesOrNoEnum.YES.equals(groupInfo.getKicked())) {
+                // 更新信息
                 groupInfoService.updateById(new ChatGroupInfo().setInfoId(groupInfo.getInfoId()).setKicked(YesOrNoEnum.NO));
+                // 清空缓存
+                redisUtils.delete(StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, userId));
                 newUserList.add(chatUser);
             }
         }

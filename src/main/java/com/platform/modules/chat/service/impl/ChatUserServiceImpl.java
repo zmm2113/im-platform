@@ -241,7 +241,7 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
         this.updateById(chatUser);
         // 拉取离线消息
         String device = ServletUtils.getRequest().getHeader(HeadConstant.DEVICE);
-        if (HeadConstant.DEVICE_IOS.equals(device) || HeadConstant.DEVICE_ANDROID.equals(device)) {
+        if (HeadConstant.DEVICE_IOS.contains(device) || HeadConstant.DEVICE_ANDROID.contains(device)) {
             chatPushService.pullOffLine(userId);
         }
         return Dict.create().set("token", token);
