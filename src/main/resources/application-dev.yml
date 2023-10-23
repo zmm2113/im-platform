@@ -21,7 +21,7 @@ platform:
   # 富文本路径 示例（ Windows配置D:/platform/uploadPath，Linux配置 /home/platform/uploadPath）
   rootPath: E:/platform/uploadPath
   # 系统版本
-  version: 1.3.0
+  version: 1.2.0
   # 日志地址
   logPath: ./logs
   # token超时时间（分钟）默认7天
