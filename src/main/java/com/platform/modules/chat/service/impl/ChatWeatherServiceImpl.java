@@ -7,7 +7,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.exception.BaseException;
-import com.platform.common.utils.redis.RedisUtils;
+import com.platform.common.redis.RedisUtils;
 import com.platform.modules.chat.config.AmapConfig;
 import com.platform.modules.chat.service.ChatWeatherService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,7 @@
 package com.platform.common.version;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -8,18 +10,18 @@ import lombok.Getter;
 @Getter
 public enum VersionEnum {
 
-    V1_0_0("1.0.0", "初始化版本", "第一个版本"),
-    V1_1_0("1.1.0", "初始化版本", "增加websocket"),
+    V1_0_0("1.0.0", "初始化版本"),
+    V1_0_1("1.0.1", "下一个版本"),
     ;
 
+    @EnumValue
+    @JsonValue
     private final String code;
     private final String info;
-    private final String remark;
 
-    VersionEnum(String code, String info, String remark) {
+    VersionEnum(String code, String info) {
         this.code = code;
         this.info = info;
-        this.remark = remark;
     }
 
 }

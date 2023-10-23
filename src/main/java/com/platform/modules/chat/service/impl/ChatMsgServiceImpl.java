@@ -1,11 +1,11 @@
 package com.platform.modules.chat.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.utils.redis.RedisUtils;
+import com.platform.common.utils.TimerUtils;
 import com.platform.common.web.service.impl.BaseServiceImpl;
 import com.platform.modules.chat.dao.ChatMsgDao;
 import com.platform.modules.chat.domain.*;
@@ -16,10 +16,9 @@ import com.platform.modules.chat.vo.ChatVo01;
 import com.platform.modules.chat.vo.ChatVo02;
 import com.platform.modules.chat.vo.ChatVo03;
 import com.platform.modules.chat.vo.ChatVo04;
-import com.platform.modules.push.enums.PushMsgTypeEnum;
+import com.platform.modules.push.enums.PushMsgEnum;
 import com.platform.modules.push.enums.PushTalkEnum;
 import com.platform.modules.push.service.ChatPushService;
-import com.platform.modules.push.vo.PushBodyVo;
 import com.platform.modules.push.vo.PushParamVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -58,9 +58,6 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
     @Resource
     private ChatTalkService chatTalkService;
 
-    @Resource
-    private RedisUtils redisUtils;
-
     @Autowired
     public void setBaseDao() {
         super.setBaseDao(chatMsgDao);
@@ -77,66 +74,137 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
     public ChatVo03 sendFriendMsg(ChatVo01 chatVo) {
         Long userId = ShiroUtils.getUserId();
         Long friendId = chatVo.getUserId();
-        PushMsgTypeEnum msgType = chatVo.getMsgType();
-        ChatVo04 chatVo04 = null;
         // 系统好友
-        PushParamVo paramVo = chatTalkService.talk(chatVo.getUserId(), chatVo.getContent());
-        if (paramVo != null) {
-            friendId = userId;
-            msgType = PushMsgTypeEnum.TEXT;
+        if (friendId.equals(10002L) || friendId.equals(10003L)) {
+            return sys(chatVo);
         }
         // 自己给自己发消息
-        else if (userId.equals(friendId)) {
-            paramVo = ChatUser.initParam(chatUserService.getById(userId))
-                    .setUserType(FriendTypeEnum.SELF)
-                    .setContent(chatVo.getContent());
+        if (userId.equals(friendId)) {
+            return self(chatVo);
         }
         // 发送给好友的消息
-        else {
-            // 校验好友
-            ChatFriend friend1 = friendService.getFriend(userId, friendId);
-            if (friend1 == null) {
-                return doResult(MsgStatusEnum.FRIEND_TO);
-            }
-            ChatFriend friend2 = friendService.getFriend(friendId, userId);
-            if (friend2 == null) {
-                return doResult(MsgStatusEnum.FRIEND_FROM);
-            }
-            if (YesOrNoEnum.YES.equals(friend2.getBlack())) {
-                return doResult(MsgStatusEnum.FRIEND_BLACK);
-            }
-            ChatUser toUser = chatUserService.getById(friendId);
-            if (toUser == null) {
-                return doResult(MsgStatusEnum.FRIEND_DELETED);
-            }
-            paramVo = ChatUser.initParam(chatUserService.getById(userId))
-                    .setNickName(friend2.getRemark())
-                    .setTop(friend2.getTop())
-                    .setContent(chatVo.getContent());
-            if (PushMsgTypeEnum.TRTC_VOICE_START.equals(msgType)
-                    || PushMsgTypeEnum.TRTC_VIDEO_START.equals(msgType)) {
-                chatVo04 = new ChatVo04()
-                        .setUserId(friendId)
-                        .setTrtcId(AppConstants.REDIS_TRTC_USER + friendId)
-                        .setPortrait(toUser.getPortrait())
-                        .setNickName(friend1.getRemark());
-            }
-        }
-        // 保存数据
+        return friend(chatVo);
+    }
+
+    /**
+     * 保存消息
+     */
+    private ChatMsg saveMsg(ChatVo01 chatVo) {
+        Long userId = ShiroUtils.getUserId();
         ChatMsg chatMsg = new ChatMsg()
                 .setFromId(userId)
-                .setToId(friendId)
-                .setMsgType(msgType)
+                .setToId(chatVo.getUserId())
+                .setMsgType(chatVo.getMsgType())
                 .setTalkType(PushTalkEnum.SINGLE)
-                .setContent(paramVo.getContent())
+                .setContent(chatVo.getContent())
                 .setCreateTime(DateUtil.date());
         this.add(chatMsg);
+        return chatMsg;
+    }
+
+    /**
+     * 系统消息
+     */
+    private ChatVo03 sys(ChatVo01 chatVo) {
+        // 保存消息
+        ChatMsg chatMsg = this.saveMsg(chatVo);
+        Long userId = ShiroUtils.getUserId();
+        Long friendId = chatVo.getUserId();
+        String content = chatVo.getContent();
+        // 异步执行
+        TimerUtils.instance().addTask((timeout) -> {
+            // 发送聊天
+            PushParamVo paramVo = chatTalkService.talk(friendId, content);
+            if (paramVo == null) {
+                return;
+            }
+            // 推送
+            chatPushService.pushMsg(paramVo.setToId(userId).setMsgId(IdWorker.getId()), PushMsgEnum.TEXT);
+        }, 2, TimeUnit.SECONDS);
+        // 返回结果
+        return doResult(MsgStatusEnum.NORMAL)
+                .setMsgId(chatMsg.getId());
+    }
+
+    /**
+     * 自己消息
+     */
+    private ChatVo03 self(ChatVo01 chatVo) {
+        // 保存消息
+        ChatMsg chatMsg = this.saveMsg(chatVo);
+        Long userId = ShiroUtils.getUserId();
+        Long friendId = chatVo.getUserId();
+        String content = chatVo.getContent();
+        PushMsgEnum msgType = chatVo.getMsgType();
+        // 组装推送
+        PushParamVo paramVo = ChatUser.initParam(chatUserService.getById(userId))
+                .setUserType(FriendTypeEnum.SELF)
+                .setContent(content)
+                .setToId(friendId)
+                .setMsgId(IdWorker.getId());
         // 推送
-        chatPushService.pushMsg(paramVo.setToId(friendId).setMsgId(chatMsg.getId()), msgType);
+        // 异步执行
+        TimerUtils.instance().addTask((timeout) -> {
+            // 推送
+            chatPushService.pushMsg(paramVo, msgType);
+        }, 2, TimeUnit.SECONDS);
+        // 返回结果
+        return doResult(MsgStatusEnum.NORMAL)
+                .setMsgId(chatMsg.getId());
+    }
+
+    /**
+     * 好友消息
+     */
+    private ChatVo03 friend(ChatVo01 chatVo) {
+        Long userId = ShiroUtils.getUserId();
+        Long friendId = chatVo.getUserId();
+        String content = chatVo.getContent();
+        PushMsgEnum msgType = chatVo.getMsgType();
+        // 校验好友
+        ChatFriend friend1 = friendService.getFriend(userId, friendId);
+        if (friend1 == null) {
+            return doResult(MsgStatusEnum.FRIEND_TO);
+        }
+        // 校验好友
+        ChatFriend friend2 = friendService.getFriend(friendId, userId);
+        if (friend2 == null) {
+            return doResult(MsgStatusEnum.FRIEND_FROM);
+        }
+        // 校验黑名单
+        if (YesOrNoEnum.YES.equals(friend2.getBlack())) {
+            return doResult(MsgStatusEnum.FRIEND_BLACK);
+        }
+        // 校验好友
+        ChatUser toUser = chatUserService.getById(friendId);
+        if (toUser == null) {
+            return doResult(MsgStatusEnum.FRIEND_DELETED);
+        }
+        // 保存消息
+        ChatMsg chatMsg = this.saveMsg(chatVo);
+        // 组装推送
+        PushParamVo paramVo = ChatUser.initParam(chatUserService.getById(userId))
+                .setNickName(friend2.getRemark())
+                .setTop(friend2.getTop())
+                .setContent(content)
+                .setToId(friendId)
+                .setMsgId(chatMsg.getId());
+        ChatVo04 chatVo04 = null;
+        if (PushMsgEnum.TRTC_VOICE_START.equals(msgType)
+                || PushMsgEnum.TRTC_VIDEO_START.equals(msgType)) {
+            chatVo04 = new ChatVo04()
+                    .setUserId(friendId)
+                    .setTrtcId(AppConstants.REDIS_TRTC_USER + friendId)
+                    .setPortrait(toUser.getPortrait())
+                    .setNickName(friend1.getRemark());
+        }
+        // 推送
+        chatPushService.pushMsg(paramVo, msgType);
         return doResult(MsgStatusEnum.NORMAL)
                 .setMsgId(chatMsg.getId())
                 .setUserInfo(chatVo04);
     }
+
 
     /**
      * 返回发送结果
@@ -157,7 +225,7 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
         }
         // 查询群明细
         ChatGroupInfo groupInfo = groupInfoService.getGroupInfo(groupId, fromId, YesOrNoEnum.NO);
-        if (groupInfo == null || YesOrNoEnum.YES.equals(groupInfo.getKicked())) {
+        if (groupInfo == null) {
             return doResult(MsgStatusEnum.GROUP_INFO_NOT_EXIST);
         }
         // 保存数据
@@ -177,19 +245,9 @@ public class ChatMsgServiceImpl extends BaseServiceImpl<ChatMsg> implements Chat
                 .setNickName(group.getName())
                 .setPortrait(group.getPortrait());
         // 推送
-        chatPushService.pushMsg(userList, groupUser, chatVo.getMsgType());
+        chatPushService.pushGroupMsg(userList, groupUser, chatVo.getMsgType());
         return doResult(MsgStatusEnum.NORMAL)
                 .setMsgId(chatMsg.getId());
-    }
-
-    @Override
-    public PushBodyVo getBigMsg(String msgId) {
-        String key = AppConstants.REDIS_MSG_BIG + msgId;
-        if (!redisUtils.hasKey(key)) {
-            return null;
-        }
-        String jsonStr = redisUtils.get(key);
-        return JSONUtil.toBean(jsonStr, PushBodyVo.class);
     }
 
 }

@@ -28,8 +28,6 @@ public class ShakeController extends BaseController {
 
     /**
      * 发送摇一摇
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping(value = "/doShake")

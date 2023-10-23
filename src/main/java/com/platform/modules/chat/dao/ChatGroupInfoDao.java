@@ -17,8 +17,6 @@ public interface ChatGroupInfoDao extends BaseDao<ChatGroupInfo> {
 
     /**
      * 查询列表
-     *
-     * @return
      */
     List<ChatGroupInfo> queryList(ChatGroupInfo chatGroupInfo);
 

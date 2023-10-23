@@ -20,12 +20,13 @@ package com.platform.modules.auth.service.impl;
 import cn.hutool.json.JSONUtil;
 import com.platform.common.config.PlatformConfig;
 import com.platform.common.constant.HeadConstant;
+import com.platform.common.redis.RedisUtils;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.shiro.vo.LoginUser;
-import com.platform.common.utils.redis.RedisUtils;
+import com.platform.common.shiro.LoginUser;
 import com.platform.modules.auth.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -61,6 +62,9 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void deleteToken(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return;
+        }
         redisUtils.delete(makeToken(token));
     }
 

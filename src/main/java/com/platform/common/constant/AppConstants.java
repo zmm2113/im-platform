@@ -16,19 +16,9 @@ public class AppConstants {
     public static final String DEFAULT_PORTRAIT = "http://q3z3-im.oss-cn-beijing.aliyuncs.com/61bed1c563de173eb00e8d8c.png";
 
     /**
-     * 注销头像
-     */
-    public static final String DELETED_PORTRAIT = "http://q3z3-im.oss-cn-beijing.aliyuncs.com/61bed1c563de173eb00e8d8c.png";
-
-    /**
      * 注销昵称
      */
     public static final String DELETED_NICK_NAME = "已注销";
-
-    /**
-     * base64图片前缀
-     */
-    public static final String BASE64_PREFIX = "data:image/png;base64,";
 
     /**
      * 用户二维码
@@ -41,29 +31,9 @@ public class AppConstants {
     public static final String QR_CODE_GROUP = "group:";
 
     /**
-     * 二维码尺寸
-     */
-    public static final Integer QR_CODE_SIZE = 600;
-
-    /**
      * 视频参数
      */
     public static final String VIDEO_PARAM = "?x-oss-process=video/snapshot,t_1000,f_png,w_600,m_fast";
-
-    /**
-     * 图片参数
-     */
-    public static final String IMAGE_PARAM = "?x-oss-process=image/resize,w_200";
-
-    /**
-     * redis_二维码
-     */
-    public static final String REDIS_QR_CODE = "chat:qr_code:";
-
-    /**
-     * redis_二维码时间(天)
-     */
-    public static final Integer REDIS_QR_CODE_TIME = 60;
 
     /**
      * 新建群名称：好友创建通知
@@ -146,11 +116,6 @@ public class AppConstants {
     public static final String REDIS_FRIEND_NOTICE = "friend:notice:";
 
     /**
-     * redis_推送token
-     */
-    public static final String REDIS_PUSH_TOKEN = "chat:push:";
-
-    /**
      * redis_附近的人
      */
     public static final String REDIS_NEAR = "chat:near";
@@ -166,19 +131,14 @@ public class AppConstants {
     public static final String REDIS_GEO = "chat:geo";
 
     /**
-     * redis_消息_普通消息
+     * redis_消息
      */
-    public static final String REDIS_MSG = "chat:msg:";
-
-    /**
-     * redis_消息_大消息
-     */
-    public static final String REDIS_MSG_BIG = "chat:msg_big:";
+    public static final String REDIS_MSG = "chat:msg:{}:{}";
 
     /**
      * redis_消息(天数)
      */
-    public static final Integer REDIS_MSG_TIME = 60;
+    public static final Integer REDIS_MSG_TIME = 7;
 
     /**
      * redis_天气

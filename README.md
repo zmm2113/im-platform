@@ -7,10 +7,7 @@
 + 前端源码地址：[https://gitee.com/lakaola/im-uniapp](https://gitee.com/lakaola/im-uniapp)
 + 后端源码地址：[https://gitee.com/lakaola/im-platform](https://gitee.com/lakaola/im-platform)
 + 下载体验地址：[https://im.q3z3.com/](https://im.q3z3.com/)
-+ 加入QQ群：   
-[![Q群3](https://img.shields.io/badge/Q群3-60559794-blue.svg)](https://jq.qq.com/?_wv=1027&k=etm5kfCT)（60559794）   
-[![Q群2](https://img.shields.io/badge/Q群2-671590862-blue.svg)](https://jq.qq.com/?_wv=1027&k=9VJv8p2I)（671590862）(已满)   
-[![Q群1](https://img.shields.io/badge/Q群1-535099683-blue.svg)](https://jq.qq.com/?_wv=1027&k=PQMnFugm)（535099683）(已满)
++ 加入QQ群：[![加入QQ群](https://img.shields.io/badge/加入QQ群-535099683-blue.svg)](https://jq.qq.com/?_wv=1027&k=PQMnFugm)（535099683）
 
 #### 二、使用须知
 + 仅允许`技术学习`使用
@@ -47,14 +44,14 @@
 + 适配PC端[Mac]
 + 适配WEB端[后台管理集成通信]
 + 增加后台管理端[管理后台]
-+ 更换手机端UI[独立UI] 
++ 更换手机端UI[独立UI]
 + 增加通知栏消息展示[当app后台挂起，通知栏展示消息]
 + 各大应用市场上架
 + 后端优化，支持大并发
 + ...
 
 #### 七、版本迭代    
-+ 1.2.0    
++ 1.2.0   
     1、修复群名称、昵称显示问题   
     2、修复性别显示问题   
     3、修复部分手机日期显示问题   

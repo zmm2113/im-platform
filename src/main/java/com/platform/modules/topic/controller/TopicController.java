@@ -34,8 +34,6 @@ public class TopicController extends BaseController {
 
     /**
      * 修改封面
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editCover")

@@ -33,10 +33,6 @@ public class MyVo09 {
      */
     private String phone;
     /**
-     * 推送id
-     */
-    private String cid;
-    /**
      * 微聊号
      */
     private String chatNo;

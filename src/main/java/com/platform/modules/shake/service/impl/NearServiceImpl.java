@@ -20,9 +20,9 @@ package com.platform.modules.shake.service.impl;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
 import com.platform.common.constant.AppConstants;
+import com.platform.common.redis.GeoHashUtils;
+import com.platform.common.redis.GeoVo;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.utils.redis.GeoHashUtils;
-import com.platform.common.utils.redis.GeoVo;
 import com.platform.modules.chat.domain.ChatUser;
 import com.platform.modules.chat.service.ChatUserService;
 import com.platform.modules.shake.service.NearService;
@@ -73,7 +73,7 @@ public class NearServiceImpl implements NearService {
         // 当前用户
         String userId = NumberUtil.toStr(ShiroUtils.getUserId());
         // 1000公里内的9999个用户
-        List<GeoResult<GeoVo>> geoResults = geoHashUtils.radius(AppConstants.REDIS_NEAR, userId, 1000, 9999);
+        List<GeoResult<GeoVo>> geoResults = geoHashUtils.radius(AppConstants.REDIS_NEAR, userId, 100, 99);
         // 过滤
         List<String> userList = new ArrayList<>();
         List<NearVo02> dataList = geoResults.stream().collect(ArrayList::new, (x, y) -> {

@@ -1,8 +1,10 @@
 package com.platform.common.config;
 
+import cn.hutool.core.io.file.FileNameUtil;
 import com.platform.common.version.DeviceInterceptor;
 import com.platform.common.version.VersionHandlerMapping;
 import com.platform.common.version.VersionInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -35,10 +37,15 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         converters.add(ApplicationConfig.objectMapper());
     }
 
+    @Value("${platform.rootPath}")
+    private String rootPath;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        /** 本地文件上传路径 */
-//        registry.addResourceHandler(PlatformConfig.PREVIEW + "/**").addResourceLocations("file:" + PlatformConfig.ROOT_PATH + "/");
+        // favicon.ico
+        registry.addResourceHandler(PlatformConfig.FAVICON).addResourceLocations("classpath:/static/");
+        // file
+        registry.addResourceHandler(PlatformConfig.PREVIEW).addResourceLocations("file:" + rootPath + FileNameUtil.UNIX_SEPARATOR);
     }
 
     /**
@@ -46,8 +53,12 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(versionInterceptor).addPathPatterns("/**");
-        registry.addInterceptor(deviceInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(versionInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(PlatformConfig.FAVICON, PlatformConfig.PREVIEW);
+        registry.addInterceptor(deviceInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(PlatformConfig.FAVICON, PlatformConfig.PREVIEW);
     }
 
 }

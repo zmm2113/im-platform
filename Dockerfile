@@ -11,7 +11,7 @@ VOLUME /tmp
 # 将jar包添加到容器中并更名为platform-admin.jar
 WORKDIR /data
 RUN mkdir logs
-ADD target/platform-api.jar platform-admin.jar
+ADD target/open-api.jar platform-admin.jar
 # 修改时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

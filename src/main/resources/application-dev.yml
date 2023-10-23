@@ -21,47 +21,44 @@ platform:
   # 富文本路径 示例（ Windows配置D:/platform/uploadPath，Linux配置 /home/platform/uploadPath）
   rootPath: E:/platform/uploadPath
   # 系统版本
-  version: 1.0.0
+  version: 1.3.0
   # 日志地址
   logPath: ./logs
   # token超时时间（分钟）默认7天
   timeout: 10080
   # 短信开关（N关Y开）
   sms: N
+  # 跨域开关（N关Y开）
+  cors: N
 
 # oss配置
-oss:
-  serverUrl:
-  accessKey:
-  secretKey:
-  bucketName:
-  region:
+upload:
+  uploadType: oss
+  serverUrl: http://xxxx.oss-cn-beijing.aliyuncs.com
+  accessKey: xxxxxxxxxxxxxxx
+  secretKey: xxxxxxxxxxxxxxxxx
+  bucket: xxxx
+  region: oss-cn-beijing.aliyuncs.com
+  post: ?x-oss-process=video/snapshot,t_1,m_fast
 
 # 实时语音/视频
 trtc:
   # appId
-  appId:
-  # 签名过期时间，单位秒
-  expire:
+  appId: xxxxxxxxxx
+  # 签名过期时间，单位秒，默认604800
+  expire: 604800
   # 签名秘钥
-  secret:
-
-# 推送配置
-push:
-  appId:
-  appKey:
-  appSecret:
-  masterSecret:
+  secret: xxxxxxxxxxxxxxxxxxxx
 
 # 高德地图配置
 amap:
-  key:
+  key: xxxxxxxxxxxxxxxxxxxxx
 
 # 腾讯nlp配置
 tencent:
-  appId:
-  appKey:
-  appSecret:
+  appId: xxxxxxxxxxxxxxxx
+  appKey: xxxxxxxxxxxxxxxxxxxxxx
+  appSecret: xxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # Spring配置
 spring:
@@ -77,9 +74,9 @@ spring:
   servlet:
     multipart:
       # 单个文件大小
-      max-file-size:  10MB
+      max-file-size: -1
       # 设置总上传的文件大小
-      max-request-size:  20MB
+      max-request-size: -1
 
   # ShardingSphere 配置项
   shardingsphere:
@@ -91,7 +88,7 @@ spring:
       master:
         type: com.zaxxer.hikari.HikariDataSource # 使用 Hikari 数据库连接池
         driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbc-url: jdbc:mysql://127.0.0.1:3306/boot-im?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&verifyServerCertificate=false&serverTimezone=GMT%2B8&allowMultiQueries=true
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/boot-im?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&verifyServerCertificate=false&serverTimezone=GMT%2B8&allowMultiQueries=true
         username: root
         password: root
     # 拓展属性配置
@@ -123,33 +120,6 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
-
-# MyBatis配置
-mybatis-plus:
-  mapperLocations: classpath*:mapper/**/*Dao.xml
-  #实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: com.platform
-  typeEnumsPackage: com.platform
-  configuration:
-    defaultEnumTypeHandler: org.apache.ibatis.type.EnumOrdinalTypeHandler
-    mapUnderscoreToCamelCase: true
-    #日志打印
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    cacheEnabled: true
-  global-config:
-    banner: false
-    dbConfig:
-      #逻辑删除
-      logicDeleteValue: "null" # 逻辑已删除值(默认为 1)
-      logicNotDeleteValue: 0 # 逻辑未删除值(默认为 0)
-
-# PageHelper分页插件
-pagehelper:
-  helperDialect: mysql
-  # 合理化分页
-  reasonable: false
-  supportMethodsArguments: true
-  params: count=countSql
 
 # 日志配置
 logging:

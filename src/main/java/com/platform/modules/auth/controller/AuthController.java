@@ -50,6 +50,20 @@ public class AuthController extends BaseController {
     @PostMapping(value = "/sendCode")
     @SubmitRepeat
     public AjaxResult sendCode(@Validated @RequestBody SmsVo smsVo) {
+        ChatUser chatUser = chatUserService.queryByPhone(smsVo.getPhone());
+        switch (smsVo.getType()) {
+            case LOGIN:
+            case FORGET:
+                if (chatUser == null) {
+                    throw new BaseException("用户未注册，请先注册");
+                }
+                break;
+            case REGISTERED:
+                if (chatUser != null) {
+                    throw new BaseException("用户已注册，请直接登录");
+                }
+                break;
+        }
         return AjaxResult.success(smsService.sendSms(smsVo)).put("msg", "验证码已发送");
     }
 
@@ -76,7 +90,7 @@ public class AuthController extends BaseController {
     public AjaxResult login(@Validated @RequestBody AuthVo02 authVo) {
         // 执行登录
         ShiroLoginAuth loginAuth = new ShiroLoginAuth(authVo.getPhone(), authVo.getPassword());
-        Dict dict = chatUserService.doLogin(loginAuth, authVo.getCid());
+        Dict dict = chatUserService.doLogin(loginAuth);
         return AjaxResult.success(dict);
     }
 
@@ -91,7 +105,7 @@ public class AuthController extends BaseController {
         smsService.verifySms(authVo.getPhone(), authVo.getCode(), SmsTypeEnum.LOGIN);
         // 执行登录
         ShiroLoginPhone loginPhone = new ShiroLoginPhone(authVo.getPhone());
-        Dict dict = chatUserService.doLogin(loginPhone, authVo.getCid());
+        Dict dict = chatUserService.doLogin(loginPhone);
         return AjaxResult.success(dict);
     }
 

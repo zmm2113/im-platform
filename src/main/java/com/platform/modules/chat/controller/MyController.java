@@ -31,8 +31,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改密码
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editPass")
@@ -62,15 +60,6 @@ public class MyController extends BaseController {
     }
 
     /**
-     * 重置二维码
-     */
-    @ApiVersion(VersionEnum.V1_0_0)
-    @GetMapping("/resetQrCode")
-    public AjaxResult resetQrCode() {
-        return AjaxResult.success(chatUserService.resetQrCode());
-    }
-
-    /**
      * 获取基本信息
      */
     @ApiVersion(VersionEnum.V1_0_0)
@@ -81,8 +70,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改头像
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editPortrait")
@@ -97,8 +84,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改昵称
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editNick")
@@ -112,8 +97,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改性别
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editGender")
@@ -128,8 +111,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改微聊号
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editChatNo")
@@ -141,8 +122,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改个性签名
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editIntro")
@@ -157,8 +136,6 @@ public class MyController extends BaseController {
 
     /**
      * 修改省市
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping("/editCity")
@@ -193,16 +170,14 @@ public class MyController extends BaseController {
     }
 
     /**
-     * 更新cid
-     *
-     * @return 结果
+     * 刷新
      */
     @ApiVersion(VersionEnum.V1_0_0)
-    @GetMapping("/bindCid/{cid}")
-    public AjaxResult bindCid(@PathVariable String cid) {
-        // 绑定cid
-        chatUserService.bindCid(cid);
+    @GetMapping("/refresh")
+    public AjaxResult refresh() {
+        chatUserService.refresh();
         return AjaxResult.success();
     }
+
 
 }

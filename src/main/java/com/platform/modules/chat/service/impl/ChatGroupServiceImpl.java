@@ -1,7 +1,6 @@
 package com.platform.modules.chat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
@@ -11,14 +10,13 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.PageHelper;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.utils.redis.RedisUtils;
 import com.platform.common.web.service.impl.BaseServiceImpl;
 import com.platform.modules.chat.dao.ChatGroupDao;
 import com.platform.modules.chat.domain.*;
@@ -32,7 +30,7 @@ import com.platform.modules.chat.vo.GroupVo02;
 import com.platform.modules.chat.vo.GroupVo03;
 import com.platform.modules.chat.vo.GroupVo07;
 import com.platform.modules.chat.vo.GroupVo08;
-import com.platform.modules.push.enums.PushMsgTypeEnum;
+import com.platform.modules.push.enums.PushMsgEnum;
 import com.platform.modules.push.service.ChatPushService;
 import com.platform.modules.push.vo.PushParamVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,6 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -71,11 +68,6 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
     private ChatPushService chatPushService;
 
     @Autowired
-    private RedisUtils redisUtils;
-
-    private static final Integer GROUP_COUNT = 9;
-
-    @Autowired
     public void setBaseDao() {
         super.setBaseDao(chatGroupDao);
     }
@@ -97,10 +89,11 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         // 当前时间
         Date now = DateUtil.date();
         // 建群
+        String portrait = "https://img.alicdn.com/imgextra/i3/87413133/O1CN01mHA9DJ1Z0xlORnKuW_!!87413133.png";
         ChatGroup group = new ChatGroup()
                 .setMaster(master.getUserId())
                 .setName(StrUtil.format(AppConstants.GROUP_CREATE_NAME, master.getNickName(), RandomUtil.randomString(4)))
-                .setPortrait(initPortrait(userList, master))
+                .setPortrait(JSONUtil.toJsonStr(new JSONArray().put(portrait)))
                 .setCreateTime(now);
         this.add(group);
         // 群明细
@@ -117,7 +110,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                 .setPortrait(group.getPortrait())
                 .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_CREATE_MEMBER, master.getNickName()));
         // 通知组员
-        chatPushService.pushMsg(formatFrom(list, paramVo1), paramVo1, PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(formatFrom(list, paramVo1), paramVo1, PushMsgEnum.ALERT);
         // 通知群主
         List<String> nickList = userList.stream().map(ChatUser::getNickName).collect(Collectors.toList());
         String content = StrUtil.format(AppConstants.NOTICE_GROUP_CREATE_MASTER, CollUtil.join(nickList, "、"));
@@ -127,7 +120,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                 .setPortrait(group.getPortrait())
                 .setContent(content)
                 .setToId(userId);
-        chatPushService.pushMsg(Arrays.asList(paramVo2), paramVo2, PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(Arrays.asList(paramVo2), paramVo2, PushMsgEnum.ALERT);
     }
 
     /**
@@ -152,9 +145,9 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         ChatGroupInfo info = groupInfoService.getGroupInfo(groupId, userId, YesOrNoEnum.YES);
         // 组装返回值
         Dict groupDict = Dict.create().parseBean(group)
-                .filter("name", "notice")
+                .filter("name", "notice", "portrait")
                 .set("groupId", group.getId());
-        Dict setDict = Dict.create().parseBean(info)
+        Dict set = Dict.create().parseBean(info)
                 .filter("top", "disturb", "keepGroup");
         List<Long> userList = groupInfoService.queryUserList(groupId);
         List<Dict> userDict = chatUserService.getByIds(userList).stream().collect(ArrayList::new, (x, y) -> {
@@ -163,7 +156,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         return Dict.create()
                 .set("user", userDict)
                 .set("group", groupDict)
-                .set("set", setDict)
+                .set("set", set)
                 .set("master", group.getMaster().equals(userId) ? YesOrNoEnum.YES : YesOrNoEnum.NO);
     }
 
@@ -176,8 +169,6 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         Long userId = ShiroUtils.getUserId();
         // 验证群
         groupInfoService.getGroupInfo(groupId, userId, YesOrNoEnum.YES);
-        // 查询数量
-        Long count = groupInfoService.countByGroup(groupId);
         // 集合
         Map<Long, ChatGroupInfo> infoMap = groupInfoService.queryUserMap(groupId);
         // 群明细
@@ -190,41 +181,15 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                 infoList.add(new ChatGroupInfo(chatUser.getUserId(), groupId));
                 newUserList.add(chatUser);
             }
-            // 更新
-            else if (YesOrNoEnum.YES.equals(groupInfo.getKicked())) {
-                // 更新信息
-                groupInfoService.updateById(new ChatGroupInfo().setInfoId(groupInfo.getInfoId()).setKicked(YesOrNoEnum.NO));
-                // 清空缓存
-                redisUtils.delete(StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, userId));
-                newUserList.add(chatUser);
-            }
         }
         // 批量信息
         groupInfoService.batchAdd(infoList);
-        if (count <= GROUP_COUNT) {
-            updPortrait(groupId);
-        }
         // 通知
         ChatGroup group = getById(groupId);
         List<String> nickList = newUserList.stream().map(ChatUser::getNickName).collect(Collectors.toList());
         String content = StrUtil.format(AppConstants.NOTICE_GROUP_JOIN, CollUtil.join(nickList, "、"));
         List<PushParamVo> pushParamList = queryPushParam(group, content);
-        chatPushService.pushMsg(pushParamList, PushMsgTypeEnum.ALERT);
-    }
-
-    /**
-     * 更新群头像
-     */
-    private void updPortrait(Long groupId) {
-        // 执行
-        ThreadUtil.execAsync(() -> {
-            // 执行分页
-            PageHelper.startPage(1, GROUP_COUNT, "info_id");
-            // 查询所有成员
-            List<Long> userList = groupInfoService.queryUserList(groupId);
-            String portrait = initPortrait(chatUserService.getByIds(userList), null);
-            this.updateById(new ChatGroup().setId(groupId).setPortrait(portrait));
-        });
+        chatPushService.pushGroupMsg(pushParamList, initGroupParam(group), PushMsgEnum.ALERT);
     }
 
     /**
@@ -237,7 +202,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         PageHelper.startPage(1, 1, "info_id");
         // 查询所有成员
         List<Long> userList = groupInfoService.queryUserList(groupId);
-        if (userList.size() == 0) {
+        if (CollectionUtils.isEmpty(userList)) {
             // 删除群
             this.deleteById(groupId);
             return;
@@ -261,7 +226,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                 .setDisturb(groupInfo.getDisturb())
                 .setTop(groupInfo.getTop())
                 .setContent(AppConstants.NOTICE_GROUP_TRANSFER);
-        chatPushService.pushMsg(paramVo.setToId(userId), PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(paramVo.setToId(userId), initGroupParam(group), PushMsgEnum.ALERT);
     }
 
     /**
@@ -301,43 +266,29 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         }
         // 删除成员
         groupInfoService.queryUserList(groupId, list).forEach(e -> {
-            groupInfoService.updateById(new ChatGroupInfo().setInfoId(e.getInfoId()).setKicked(YesOrNoEnum.YES));
+            groupInfoService.deleteById(e.getInfoId());
         });
-        // 更新头像
-        updPortrait(groupId);
         String groupName = formatGroupName(group.getId(), group.getName());
         // 群主
         List<String> nickList = userList.stream().map(ChatUser::getNickName).collect(Collectors.toList());
-        PushParamVo paramVo1 = new PushParamVo()
+        PushParamVo paramVo = new PushParamVo()
                 .setUserId(group.getId())
                 .setNickName(groupName)
                 .setPortrait(group.getPortrait())
                 .setDisturb(groupInfo.getDisturb())
                 .setTop(groupInfo.getTop())
                 .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_KICKED_MASTER, CollUtil.join(nickList, "、")));
-        chatPushService.pushMsg(paramVo1.setToId(group.getMaster()), PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(paramVo.setToId(group.getMaster()), paramVo, PushMsgEnum.ALERT);
         // 组员
         List<PushParamVo> paramList = queryGroupPushFrom(groupId, list, AppConstants.NOTICE_GROUP_KICKED_MEMBER);
-        chatPushService.pushMsg(paramList, PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(paramList, paramVo, PushMsgEnum.ALERT);
         // 删除缓存
         groupInfoService.delGroupInfoCache(groupId, list);
     }
 
     @Override
     public String getGroupQrCode(Long groupId) {
-        String key = AppConstants.REDIS_QR_CODE + groupId;
-        if (redisUtils.hasKey(key)) {
-            return redisUtils.get(key);
-        }
-        ChatGroup group = this.getById(groupId);
-        if (group == null) {
-            throw new BaseException("当前群不存在");
-        }
-        String content = AppConstants.QR_CODE_GROUP + groupId;
-        byte[] data = QrCodeUtil.generatePng(content, AppConstants.QR_CODE_SIZE, AppConstants.QR_CODE_SIZE);
-        String value = AppConstants.BASE64_PREFIX.concat(Base64.encode(data));
-        redisUtils.set(key, value, AppConstants.REDIS_QR_CODE_TIME, TimeUnit.DAYS);
-        return value;
+        return AppConstants.QR_CODE_GROUP + groupId;
     }
 
     @Override
@@ -394,10 +345,8 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                     .setTop(groupInfo.getTop())
                     .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_LOGOUT, chatUser.getNickName()))
                     .setToId(group.getMaster());
-            chatPushService.pushMsg(paramVo, PushMsgTypeEnum.ALERT);
+            chatPushService.pushGroupMsg(paramVo, paramVo, PushMsgEnum.ALERT);
         }
-        // 更新头像
-        updPortrait(groupId);
     }
 
     @Transactional
@@ -416,11 +365,11 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         // 删除数据
         groupInfoService.delByGroup(groupId);
         // 通知
-        chatPushService.pushMsg(userList, PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(userList, initGroupParam(group), PushMsgEnum.ALERT);
     }
 
     private List<PushParamVo> queryPushParam(ChatGroup group, String content) {
-        List<ChatGroupInfo> dataList = groupInfoService.queryList(new ChatGroupInfo().setGroupId(group.getId()).setKicked(YesOrNoEnum.NO));
+        List<ChatGroupInfo> dataList = groupInfoService.queryList(new ChatGroupInfo().setGroupId(group.getId()));
         String groupName = formatGroupName(group.getId(), group.getName());
         List<PushParamVo> arrayList = new ArrayList<>();
         dataList.forEach(e -> {
@@ -468,12 +417,18 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
             String content = StrUtil.format(AppConstants.NOTICE_GROUP_JOIN, chatUser.getNickName());
             List<PushParamVo> userList = queryPushParam(group, content);
             // 通知
-            chatPushService.pushMsg(userList, PushMsgTypeEnum.ALERT);
+            chatPushService.pushGroupMsg(userList, initGroupParam(group), PushMsgEnum.ALERT);
         }
-        // 申请
-        else if (YesOrNoEnum.YES.equals(info.getKicked())) {
-            chatApplyService.applyGroup(group.getMaster());
-        }
+    }
+
+    /**
+     * 组装群对象
+     */
+    private PushParamVo initGroupParam(ChatGroup group) {
+        return new PushParamVo()
+                .setUserId(group.getId())
+                .setNickName(group.getName())
+                .setPortrait(group.getPortrait());
     }
 
     @Override
@@ -481,7 +436,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
         // 结果
         List<GroupVo08> dataList = new ArrayList<>();
         // 查询明细
-        List<Long> groupList = groupInfoService.queryList(new ChatGroupInfo().setUserId(ShiroUtils.getUserId()).setKicked(YesOrNoEnum.NO))
+        List<Long> groupList = groupInfoService.queryList(new ChatGroupInfo().setUserId(ShiroUtils.getUserId()))
                 .stream().map(ChatGroupInfo::getGroupId).collect(Collectors.toList());
         // 集合判空
         if (CollectionUtils.isEmpty(groupList)) {
@@ -551,7 +506,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                 .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_EDIT, chatUser.getNickName(), groupVo.getName()));
         // 通知组员
         List<Long> userList = groupInfoService.queryUserList(groupId);
-        chatPushService.pushMsg(formatFrom(userList, paramVo), paramVo, PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(formatFrom(userList, paramVo), paramVo, PushMsgEnum.ALERT);
     }
 
     @Override
@@ -572,7 +527,7 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
                 .setContent(StrUtil.format(AppConstants.NOTICE_GROUP_NOTICE, chatUser.getNickName(), group.getNotice()));
         // 通知组员
         List<Long> userList = groupInfoService.queryUserList(groupId);
-        chatPushService.pushMsg(formatFrom(userList, paramVo), paramVo, PushMsgTypeEnum.ALERT);
+        chatPushService.pushGroupMsg(formatFrom(userList, paramVo), paramVo, PushMsgEnum.ALERT);
     }
 
     private List<PushParamVo> formatFrom(List<Long> userList, PushParamVo paramVo) {
@@ -581,18 +536,6 @@ public class ChatGroupServiceImpl extends BaseServiceImpl<ChatGroup> implements 
             paramList.add(BeanUtil.toBean(paramVo, PushParamVo.class).setToId(e));
         });
         return paramList;
-    }
-
-    /**
-     * 格式化头像
-     */
-    private String initPortrait(List<ChatUser> userList, ChatUser master) {
-        List<ChatUser> newUserList = userList;
-        if (master != null) {
-            newUserList = CollUtil.newArrayList(master);
-            newUserList.addAll(userList);
-        }
-        return JSONUtil.toJsonStr(CollUtil.sub(newUserList, 0, GROUP_COUNT).stream().map(ChatUser::getPortrait).collect(Collectors.toList()));
     }
 
 }

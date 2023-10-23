@@ -5,7 +5,6 @@ import com.platform.modules.chat.domain.ChatMsg;
 import com.platform.modules.chat.vo.ChatVo01;
 import com.platform.modules.chat.vo.ChatVo02;
 import com.platform.modules.chat.vo.ChatVo03;
-import com.platform.modules.push.vo.PushBodyVo;
 
 /**
  * <p>
@@ -24,10 +23,5 @@ public interface ChatMsgService extends BaseService<ChatMsg> {
      * 发送群消息
      */
     ChatVo03 sendGroupMsg(ChatVo02 chatVo);
-
-    /**
-     * 获取大消息
-     */
-    PushBodyVo getBigMsg(String msgId);
 
 }

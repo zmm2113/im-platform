@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
-import com.platform.common.utils.redis.RedisUtils;
+import com.platform.common.redis.RedisUtils;
 import com.platform.common.web.service.impl.BaseServiceImpl;
 import com.platform.modules.chat.dao.ChatGroupInfoDao;
 import com.platform.modules.chat.domain.ChatGroupInfo;
@@ -65,9 +65,6 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
         if (info == null) {
             throw new BaseException("你不在当前群中");
         }
-        if (YesOrNoEnum.YES.equals(info.getKicked())) {
-            throw new BaseException("你已被踢出");
-        }
         return info;
     }
 
@@ -80,19 +77,19 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
 
     @Override
     public Long countByGroup(Long groupId) {
-        return queryCount(new ChatGroupInfo().setGroupId(groupId).setKicked(YesOrNoEnum.NO));
+        return queryCount(new ChatGroupInfo().setGroupId(groupId));
     }
 
     @Override
     public List<Long> queryUserList(Long groupId) {
         // 查询所有成员
-        List<ChatGroupInfo> infoList = this.queryList(new ChatGroupInfo().setGroupId(groupId).setKicked(YesOrNoEnum.NO));
+        List<ChatGroupInfo> infoList = this.queryList(new ChatGroupInfo().setGroupId(groupId));
         return infoList.stream().map(ChatGroupInfo::getUserId).collect(Collectors.toList());
     }
 
     @Override
     public List<ChatGroupInfo> queryUserList(Long groupId, List<Long> userList) {
-        List<ChatGroupInfo> dataList = this.queryList(new ChatGroupInfo().setGroupId(groupId).setKicked(YesOrNoEnum.NO));
+        List<ChatGroupInfo> dataList = this.queryList(new ChatGroupInfo().setGroupId(groupId));
         if (!CollectionUtils.isEmpty(userList)) {
             dataList = dataList.stream().filter(data -> userList.contains(data.getUserId())).collect(Collectors.toList());
         }
@@ -109,11 +106,9 @@ public class ChatGroupInfoServiceImpl extends BaseServiceImpl<ChatGroupInfo> imp
     @Override
     public void delByGroup(Long groupId) {
         chatGroupInfoDao.delete(new QueryWrapper<>(new ChatGroupInfo().setGroupId(groupId)));
-        // 删除群二维码
-        redisUtils.delete(AppConstants.REDIS_QR_CODE + groupId);
         // 删除群成员
-        String key = StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, "*");
-        redisUtils.delete(key);
+        String redisKey = StrUtil.format(AppConstants.REDIS_GROUP_INFO, groupId, "*");
+        redisUtils.delete(redisKey);
     }
 
 }

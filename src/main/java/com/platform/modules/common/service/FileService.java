@@ -12,25 +12,16 @@ public interface FileService {
 
     /**
      * 文件上传
-     *
-     * @param file
-     * @return
      */
     UploadFileVo uploadFile(MultipartFile file);
 
     /**
      * 文件视频
-     *
-     * @param file
-     * @return
      */
     UploadVideoVo uploadVideo(MultipartFile file);
 
     /**
      * 文件音频
-     *
-     * @param file
-     * @return
      */
     UploadAudioVo uploadAudio(MultipartFile file);
 

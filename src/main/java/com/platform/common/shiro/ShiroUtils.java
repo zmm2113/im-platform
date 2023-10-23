@@ -2,7 +2,6 @@
 package com.platform.common.shiro;
 
 import com.platform.common.constant.HeadConstant;
-import com.platform.common.shiro.vo.LoginUser;
 import com.platform.common.utils.ServletUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;

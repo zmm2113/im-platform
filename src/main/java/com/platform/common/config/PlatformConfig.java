@@ -23,7 +23,12 @@ public class PlatformConfig {
     /**
      * 文件预览
      */
-    public static String PREVIEW = "/preview/";
+    public static String PREVIEW = "/preview/**";
+
+    /**
+     * 图标
+     */
+    public static String FAVICON = "/favicon.ico";
 
     /**
      * token超时时间（分钟）

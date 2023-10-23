@@ -12,11 +12,6 @@ public class LoginException extends AuthenticationException {
     @Getter
     private ResultCodeEnum code;
 
-    public LoginException(String message) {
-        super(message);
-        this.code = ResultCodeEnum.FAIL;
-    }
-
     public LoginException(ResultCodeEnum resultCode) {
         super(resultCode.getInfo());
         this.code = resultCode;

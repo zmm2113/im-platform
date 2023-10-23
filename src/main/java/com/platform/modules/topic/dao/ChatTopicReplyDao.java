@@ -19,8 +19,6 @@ public interface ChatTopicReplyDao extends BaseDao<ChatTopicReply> {
 
     /**
      * 查询列表
-     *
-     * @return
      */
     List<ChatTopicReply> queryList(ChatTopicReply chatTopicReply);
 

@@ -4,7 +4,7 @@
 
     <!-- 字段集 -->
     <sql id="baseSql">
-        select info_id, user_id, group_id, top, disturb, keep_group, kicked, create_time from chat_group_info
+        select info_id, user_id, group_id, top, disturb, keep_group, create_time from chat_group_info
     </sql>
 
     <!-- 查询列表字段 -->
@@ -16,9 +16,6 @@
             </if>
             <if test="groupId != null">
                 and group_id = #{groupId}
-            </if>
-            <if test="kicked != null">
-                and kicked = #{kicked.code}
             </if>
         </where>
     </select>

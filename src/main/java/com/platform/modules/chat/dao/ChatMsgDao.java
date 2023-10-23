@@ -3,6 +3,7 @@ package com.platform.modules.chat.dao;
 import com.platform.modules.chat.domain.ChatMsg;
 import org.springframework.stereotype.Repository;
 import com.platform.common.web.dao.BaseDao;
+
 import java.util.List;
 
 /**
@@ -16,8 +17,6 @@ public interface ChatMsgDao extends BaseDao<ChatMsg> {
 
     /**
      * 查询列表
-     *
-     * @return
      */
     List<ChatMsg> queryList(ChatMsg chatMsg);
 

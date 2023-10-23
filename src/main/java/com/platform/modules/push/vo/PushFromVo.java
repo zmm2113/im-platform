@@ -26,7 +26,7 @@ public class PushFromVo {
     private String nickName;
 
     /**
-     * 用户类型（normal、self、turing、weather、translation）
+     * 用户类型（normal、self、weather、translation）
      */
     private String userType;
 

@@ -11,8 +11,8 @@
     <select id="queryList" resultType="com.platform.modules.chat.domain.ChatFriend">
         <include refid="baseSql"/>
         <where>
-            <if test="userId != null">
-                and user_id = #{userId}
+            <if test="fromId != null">
+                and from_id = #{fromId}
             </if>
         </where>
     </select>

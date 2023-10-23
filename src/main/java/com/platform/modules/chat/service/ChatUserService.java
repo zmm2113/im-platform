@@ -27,8 +27,6 @@ public interface ChatUserService extends BaseService<ChatUser> {
 
     /**
      * 重置密码
-     *
-     * @return
      */
     void resetPass(Long userId, String password);
 
@@ -53,11 +51,6 @@ public interface ChatUserService extends BaseService<ChatUser> {
     String getQrCode();
 
     /**
-     * 获取二维码
-     */
-    String resetQrCode();
-
-    /**
      * 用户注销
      */
     void deleted();
@@ -65,7 +58,7 @@ public interface ChatUserService extends BaseService<ChatUser> {
     /**
      * 执行登录/返回token
      */
-    Dict doLogin(AuthenticationToken authenticationToken, String cid);
+    Dict doLogin(AuthenticationToken authenticationToken);
 
     /**
      * 退出登录
@@ -73,7 +66,8 @@ public interface ChatUserService extends BaseService<ChatUser> {
     void logout();
 
     /**
-     * 绑定cid
+     * 刷新
      */
-    void bindCid(String cid);
+    void refresh();
+
 }

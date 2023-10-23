@@ -103,7 +103,6 @@ CREATE TABLE `chat_group_info` (
   `top` char(1) DEFAULT 'N' COMMENT '是否置顶',
   `disturb` char(1) DEFAULT 'N' COMMENT '是否免打扰',
   `keep_group` char(1) DEFAULT 'N' COMMENT '是否保存群组',
-  `kicked` char(1) DEFAULT 'N' COMMENT '是否被踢',
   `create_time` datetime DEFAULT NULL COMMENT '加入时间',
   PRIMARY KEY (`info_id`),
   UNIQUE KEY `idx_group` (`user_id`,`group_id`)
@@ -175,9 +174,7 @@ CREATE TABLE `chat_user` (
   `phone` varchar(20) DEFAULT NULL COMMENT '手机号',
   `chat_no` varchar(32) DEFAULT NULL COMMENT '微聊号码',
   `nick_name` varchar(32) DEFAULT NULL COMMENT '昵称',
-  `cid` varchar(32) DEFAULT NULL COMMENT '推送id',
   `token` varchar(32) DEFAULT NULL COMMENT '用户token',
-  `status` char(1) DEFAULT 'Y' COMMENT '状态Y正常N禁用',
   `gender` varchar(1) DEFAULT '1' COMMENT '性别1男0女',
   `portrait` varchar(2000) DEFAULT NULL COMMENT '头像',
   `intro` varchar(200) DEFAULT NULL COMMENT '介绍',

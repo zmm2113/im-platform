@@ -10,8 +10,8 @@ import cn.hutool.json.JSONUtil;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
+import com.platform.common.redis.RedisUtils;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.utils.redis.RedisUtils;
 import com.platform.common.web.service.impl.BaseServiceImpl;
 import com.platform.modules.chat.dao.ChatFriendDao;
 import com.platform.modules.chat.domain.*;
@@ -21,7 +21,7 @@ import com.platform.modules.chat.enums.ApplyTypeEnum;
 import com.platform.modules.chat.enums.FriendTypeEnum;
 import com.platform.modules.chat.service.*;
 import com.platform.modules.chat.vo.*;
-import com.platform.modules.push.enums.PushMsgTypeEnum;
+import com.platform.modules.push.enums.PushMsgEnum;
 import com.platform.modules.push.service.ChatPushService;
 import com.platform.modules.push.vo.PushParamVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -192,8 +192,8 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         // 增加好友数据
         this.batchAdd(friendList);
         // 发送通知
-        chatPushService.pushMsg(ChatUser.initParam(fromUser).setContent(AppConstants.NOTICE_FRIEND_CREATE).setToId(toId), PushMsgTypeEnum.ALERT);
-        chatPushService.pushMsg(ChatUser.initParam(toUser).setContent(AppConstants.NOTICE_FRIEND_CREATE).setToId(fromId), PushMsgTypeEnum.ALERT);
+        chatPushService.pushMsg(ChatUser.initParam(fromUser).setContent(AppConstants.NOTICE_FRIEND_CREATE).setToId(toId), PushMsgEnum.ALERT);
+        chatPushService.pushMsg(ChatUser.initParam(toUser).setContent(AppConstants.NOTICE_FRIEND_CREATE).setToId(fromId), PushMsgEnum.ALERT);
     }
 
     /**
@@ -216,14 +216,10 @@ public class ChatFriendServiceImpl extends BaseServiceImpl<ChatFriend> implement
         if (groupInfo == null) {
             groupInfoService.add(new ChatGroupInfo(fromId, groupId));
         }
-        // 更新
-        else if (YesOrNoEnum.YES.equals(groupInfo.getKicked())) {
-            groupInfoService.updateById(new ChatGroupInfo().setInfoId(groupInfo.getInfoId()).setKicked(YesOrNoEnum.NO));
-        }
         // 发送通知
         String content = StrUtil.format(AppConstants.NOTICE_GROUP_JOIN, fromUser.getNickName());
         List<PushParamVo> pushParamList = groupService.queryGroupPushFrom(groupId, null, content);
-        chatPushService.pushMsg(pushParamList, PushMsgTypeEnum.ALERT);
+        chatPushService.pushMsg(pushParamList, PushMsgEnum.ALERT);
     }
 
     @Override

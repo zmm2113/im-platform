@@ -30,15 +30,11 @@ public interface SmsService {
 
     /**
      * 发送短信
-     *
-     * @return
      */
     Dict sendSms(SmsVo smsVo);
 
     /**
      * 验证短信
-     *
-     * @return
      */
     void verifySms(String phone, String code, SmsTypeEnum type);
 

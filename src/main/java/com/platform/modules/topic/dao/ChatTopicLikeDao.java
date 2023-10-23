@@ -19,8 +19,6 @@ public interface ChatTopicLikeDao extends BaseDao<ChatTopicLike> {
 
     /**
      * 查询列表
-     *
-     * @return
      */
     List<ChatTopicLike> queryList(ChatTopicLike chatTopicLike);
 

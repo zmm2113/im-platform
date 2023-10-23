@@ -4,8 +4,6 @@ import cn.hutool.core.util.RandomUtil;
 import com.platform.common.enums.ResultCodeEnum;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.LoginException;
-import com.platform.common.shiro.utils.Md5Utils;
-import com.platform.common.shiro.vo.LoginUser;
 import com.platform.common.utils.IpUtils;
 import com.platform.common.utils.ServletUtils;
 import com.platform.modules.auth.service.TokenService;
@@ -61,8 +59,7 @@ public class ShiroRealm extends AuthorizingRealm {
     public boolean supports(AuthenticationToken authenticationToken) {
         return authenticationToken instanceof ShiroLoginToken
                 || authenticationToken instanceof ShiroLoginAuth
-                || authenticationToken instanceof ShiroLoginPhone
-                || authenticationToken instanceof ShiroLoginThird;
+                || authenticationToken instanceof ShiroLoginPhone;
     }
 
     /**
@@ -105,9 +102,6 @@ public class ShiroRealm extends AuthorizingRealm {
         // 处理用户
         if (chatUser == null) {
             throw new AuthenticationException("手机号或密码不正确"); // 手机不存在
-        }
-        if (!YesOrNoEnum.YES.equals(chatUser.getStatus())) {
-            throw new LoginException("手机号已停用"); // 手机禁用
         }
         // 查询权限
         LoginUser loginUser = new LoginUser()

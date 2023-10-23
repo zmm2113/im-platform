@@ -2,7 +2,7 @@ package com.platform.modules.push.vo;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import com.platform.modules.push.enums.PushBodyTypeEnum;
+import com.platform.modules.push.enums.PushBodyEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -21,7 +21,7 @@ public class PushBodyVo {
     private String msgId;
 
     /**
-     * 消息类型（MSG/BIG/NOTICE）
+     * 消息类型（MSG/NOTICE）
      */
     private String pushType;
 
@@ -45,7 +45,7 @@ public class PushBodyVo {
      */
     private PushToVo groupInfo;
 
-    public PushBodyVo(Long msgId, PushBodyTypeEnum pushType, Object data) {
+    public PushBodyVo(Long msgId, PushBodyEnum pushType, Object data) {
         this.msgId = String.valueOf(msgId);
         this.pushType = pushType.getCode();
         this.msgContent = data;

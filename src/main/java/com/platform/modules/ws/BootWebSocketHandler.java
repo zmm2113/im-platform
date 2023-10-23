@@ -1,16 +1,10 @@
 package com.platform.modules.ws;
 
-import cn.hutool.core.lang.Dict;
-import cn.hutool.json.JSONUtil;
 import com.platform.common.constant.AppConstants;
-import com.platform.common.enums.ResultCodeEnum;
-import com.platform.common.exception.BaseException;
 import com.platform.modules.push.service.ChatPushService;
-import com.platform.modules.push.vo.PushResultVo;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -18,15 +12,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
 public class BootWebSocketHandler extends TextWebSocketHandler {
 
-    private static final ConcurrentHashMap<Long, List<WebSocketSession>> POOL_SESSION = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, WebSocketSession> POOL_SESSION = new ConcurrentHashMap<>();
 
     @Resource
     private ChatPushService chatPushService;
@@ -36,17 +28,12 @@ public class BootWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
+        // 用户id
         Long userId = (Long) session.getAttributes().get(AppConstants.USER_ID);
-        if (userId == null) {
-            throw new BaseException(ResultCodeEnum.UNAUTHORIZED);
-        }
-        List<WebSocketSession> sessionList = POOL_SESSION.get(userId);
-        if (CollectionUtils.isEmpty(sessionList)) {
-            POOL_SESSION.put(userId, sessionList = new ArrayList<>());
-        }
-        sessionList.add(session);
-        // 拉取离线消息
-        chatPushService.pullOffLine(userId);
+        // 存储
+        POOL_SESSION.put(userId, session);
+        // 离线消息
+        chatPushService.pullMsg(userId);
     }
 
     /**
@@ -66,40 +53,51 @@ public class BootWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        this.closeSession(session);
+    }
+
+    /**
+     * socket 异常连接时
+     */
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) {
+        this.closeSession(session);
+    }
+
+    /**
+     * 关闭session
+     */
+    private void closeSession(WebSocketSession session) {
+        // 用户id
         Long userId = (Long) session.getAttributes().get(AppConstants.USER_ID);
-        if (userId == null) {
-            throw new BaseException(ResultCodeEnum.UNAUTHORIZED);
+        if (session.isOpen()) {
+            try {
+                session.close();
+            } catch (IOException e) {
+            }
         }
-        List<WebSocketSession> sessionList = POOL_SESSION.get(userId);
-        if (CollectionUtils.isEmpty(sessionList)) {
-            return;
-        }
-        sessionList.remove(session);
+        // 移除
+        POOL_SESSION.remove(userId);
     }
 
     /**
      * 给某个用户发送消息
      */
-    public PushResultVo sendMsg(Long userId, Dict transmission) {
-        List<WebSocketSession> sessionList = POOL_SESSION.get(userId);
-        if (CollectionUtils.isEmpty(sessionList)) {
-            return PushResultVo.fail();
+    public boolean sendMsg(Long userId, String content) {
+        WebSocketSession session = POOL_SESSION.get(userId);
+        if (session == null) {
+            return false;
         }
-        int result = 0;
-        for (WebSocketSession session : sessionList) {
-            try {
-                if (session.isOpen()) {
-                    session.sendMessage(new TextMessage(JSONUtil.toJsonStr(transmission)));
-                    result++;
-                }
-            } catch (IOException e) {
-                log.error("发送消息给{}失败", userId, e);
-            }
+        if (!session.isOpen()) {
+            this.closeSession(session);
+            return false;
         }
-        if (result == 0) {
-            return PushResultVo.fail();
+        try {
+            session.sendMessage(new TextMessage(content));
+        } catch (IOException e) {
+            this.closeSession(session);
         }
-        return PushResultVo.success();
+        return true;
     }
 
 }

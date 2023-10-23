@@ -9,8 +9,8 @@ import com.github.pagehelper.PageInfo;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
+import com.platform.common.redis.RedisUtils;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.utils.redis.RedisUtils;
 import com.platform.common.web.page.PageDomain;
 import com.platform.common.web.page.TableSupport;
 import com.platform.common.web.service.impl.BaseServiceImpl;
@@ -18,7 +18,7 @@ import com.platform.modules.chat.domain.ChatFriend;
 import com.platform.modules.chat.domain.ChatUser;
 import com.platform.modules.chat.service.ChatFriendService;
 import com.platform.modules.chat.service.ChatUserService;
-import com.platform.modules.push.enums.PushNoticeTypeEnum;
+import com.platform.modules.push.enums.PushNoticeEnum;
 import com.platform.modules.push.service.ChatPushService;
 import com.platform.modules.push.vo.PushParamVo;
 import com.platform.modules.topic.dao.ChatTopicDao;
@@ -106,7 +106,7 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
             paramList.add(new PushParamVo().setToId(e).setPortrait(chatUser.getPortrait()));
         });
         // 推送
-        chatPushService.pushNotice(paramList, PushNoticeTypeEnum.TOPIC_RED);
+        chatPushService.pushNotice(paramList, PushNoticeEnum.TOPIC_RED);
     }
 
     @Transactional
@@ -253,7 +253,7 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
         // 给贴主发送通知
         ChatUser fromUser = ChatUser.initUser(chatUserService.getById(userId));
         PushParamVo paramVo = new PushParamVo().setToId(topic.getUserId()).setPortrait(fromUser.getPortrait());
-        chatPushService.pushNotice(paramVo, PushNoticeTypeEnum.TOPIC_REPLY);
+        chatPushService.pushNotice(paramVo, PushNoticeEnum.TOPIC_REPLY);
         // 通知
         this.addNotice(topic.getUserId(), topic, fromUser, TopicNoticeTypeEnum.LIKE, null);
     }
@@ -315,7 +315,7 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
         if (!topic.getUserId().equals(userId)) {
             // 帖主推送
             PushParamVo paramVo = new PushParamVo().setToId(topic.getUserId()).setPortrait(fromUser.getPortrait());
-            chatPushService.pushNotice(paramVo, PushNoticeTypeEnum.TOPIC_REPLY);
+            chatPushService.pushNotice(paramVo, PushNoticeEnum.TOPIC_REPLY);
             // 帖主推送
             addNotice(topic.getUserId(), topic, fromUser, TopicNoticeTypeEnum.REPLY, content);
         }
@@ -352,14 +352,14 @@ public class ChatTopicServiceImpl extends BaseServiceImpl<ChatTopic> implements 
         // 帖主推送
         if (!topic.getUserId().equals(userId)) {
             PushParamVo paramVo = new PushParamVo().setToId(topic.getUserId()).setPortrait(fromUser.getPortrait());
-            chatPushService.pushNotice(paramVo, PushNoticeTypeEnum.TOPIC_REPLY);
+            chatPushService.pushNotice(paramVo, PushNoticeEnum.TOPIC_REPLY);
             // 帖主推送
             addNotice(topic.getUserId(), topic, fromUser, TopicNoticeTypeEnum.REPLY, content);
         }
         // 用户推送
         if (!reply.getUserId().equals(userId)) {
             PushParamVo paramVo = new PushParamVo().setToId(reply.getUserId()).setPortrait(fromUser.getPortrait());
-            chatPushService.pushNotice(paramVo, PushNoticeTypeEnum.TOPIC_REPLY);
+            chatPushService.pushNotice(paramVo, PushNoticeEnum.TOPIC_REPLY);
             // 用户推送
             addNotice(reply.getUserId(), topic, fromUser, TopicNoticeTypeEnum.REPLY, content);
         }

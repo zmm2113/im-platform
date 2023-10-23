@@ -17,7 +17,7 @@
  */
 package com.platform.modules.auth.service;
 
-import com.platform.common.shiro.vo.LoginUser;
+import com.platform.common.shiro.LoginUser;
 
 /**
  * <p>
@@ -28,23 +28,16 @@ public interface TokenService {
 
     /**
      * 生成token
-     *
-     * @return
      */
     String generateToken();
 
     /**
      * 通过token查询
-     *
-     * @param token
-     * @return
      */
     LoginUser queryByToken(String token);
 
     /**
      * 删除token
-     *
-     * @param token
      */
     void deleteToken(String token);
 

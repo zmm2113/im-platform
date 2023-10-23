@@ -74,14 +74,6 @@ public class ChatUser extends BaseEntity {
      */
     private String salt;
     /**
-     * 状态Y正常N禁用
-     */
-    private YesOrNoEnum status;
-    /**
-     * 推送id
-     */
-    private String cid;
-    /**
      * 用户token
      */
     private String token;
@@ -113,9 +105,8 @@ public class ChatUser extends BaseEntity {
         }
         return new ChatUser()
                 .setGender(GenderEnum.MALE)
-                .setPortrait(AppConstants.DELETED_PORTRAIT)
-                .setNickName(AppConstants.DELETED_NICK_NAME)
-                .setStatus(YesOrNoEnum.NO);
+                .setPortrait(AppConstants.DEFAULT_PORTRAIT)
+                .setNickName(AppConstants.DELETED_NICK_NAME);
     }
 
     /**

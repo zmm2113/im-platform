@@ -50,15 +50,6 @@ public class ChatTalkServiceImpl implements ChatTalkService {
      * 好友列表
      */
     private static List<FriendVo06> friendList() {
-        // 图灵机器人
-        Long turingId = 10001L;
-        FriendTypeEnum turingType = FriendTypeEnum.TURING;
-        FriendVo06 turing = new FriendVo06()
-                .setUserId(turingId)
-                .setChatNo(NumberUtil.toStr(turingId))
-                .setNickName(turingType.getInfo())
-                .setPortrait("http://q3z3-im.oss-cn-beijing.aliyuncs.com/95079883a2f04cee830502eee97ce2a2.png")
-                .setUserType(turingType);
         // 天气机器人
         Long weatherId = 10002L;
         FriendTypeEnum weatherType = FriendTypeEnum.WEATHER;
@@ -77,7 +68,7 @@ public class ChatTalkServiceImpl implements ChatTalkService {
                 .setNickName(translationType.getInfo())
                 .setPortrait("http://q3z3-im.oss-cn-beijing.aliyuncs.com/18ac0b6aa3d147e6b1a65c2eb838707e.png")
                 .setUserType(translationType);
-        return CollUtil.newArrayList(turing, weather, translation);
+        return CollUtil.newArrayList(weather, translation);
     }
 
     @Override
@@ -107,7 +98,6 @@ public class ChatTalkServiceImpl implements ChatTalkService {
         if (friendVo == null) {
             return null;
         }
-        Long current = ShiroUtils.getUserId();
         PushParamVo paramVo = new PushParamVo()
                 .setUserId(friendVo.getUserId())
                 .setPortrait(friendVo.getPortrait())
@@ -115,9 +105,6 @@ public class ChatTalkServiceImpl implements ChatTalkService {
                 .setContent(content)
                 .setUserType(friendVo.getUserType());
         switch (friendVo.getUserType()) {
-            case TURING:
-                content = TencentUtils.turing(tencentConfig, current, content);
-                break;
             case WEATHER:
                 content = weather(content);
                 break;
@@ -134,7 +121,7 @@ public class ChatTalkServiceImpl implements ChatTalkService {
     private String weather(String content) {
         List<JSONObject> dataList = weatherService.queryByCityName(content);
         if (CollectionUtils.isEmpty(dataList)) {
-            return "暂未找到结果";
+            return "暂未找到结果，格式：北京市";
         }
         StringBuilder builder = new StringBuilder();
         dataList.forEach(e -> {

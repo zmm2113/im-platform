@@ -1,29 +1,22 @@
 package com.platform.modules.chat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.extra.qrcode.QrCodeUtil;
-import cn.hutool.extra.qrcode.QrConfig;
-import cn.hutool.http.HttpUtil;
-import com.platform.common.config.PlatformConfig;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.constant.HeadConstant;
 import com.platform.common.enums.GenderEnum;
-import com.platform.common.enums.YesOrNoEnum;
 import com.platform.common.exception.BaseException;
 import com.platform.common.exception.LoginException;
+import com.platform.common.redis.GeoHashUtils;
+import com.platform.common.redis.RedisUtils;
+import com.platform.common.shiro.Md5Utils;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.shiro.utils.Md5Utils;
 import com.platform.common.utils.ServletUtils;
-import com.platform.common.utils.redis.GeoHashUtils;
-import com.platform.common.utils.redis.RedisUtils;
 import com.platform.common.web.service.impl.BaseServiceImpl;
 import com.platform.modules.auth.service.TokenService;
 import com.platform.modules.auth.vo.AuthVo01;
@@ -41,9 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -101,7 +92,6 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
                 .setSalt(salt)
                 .setPhone(phone)
                 .setPassword(Md5Utils.credentials(password, salt))
-                .setStatus(YesOrNoEnum.YES)
                 .setCreateTime(DateUtil.date());
         try {
             this.add(cu);
@@ -168,26 +158,8 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
 
     @Override
     public String getQrCode() {
-        String key = AppConstants.REDIS_QR_CODE + ShiroUtils.getUserId();
-        if (redisUtils.hasKey(key)) {
-            return redisUtils.get(key);
-        }
-        return resetQrCode();
-    }
-
-    @Override
-    public String resetQrCode() {
         Long userId = ShiroUtils.getUserId();
-        ChatUser chatUser = getById(userId);
-        String content = AppConstants.QR_CODE_USER + userId;
-        File original = HttpUtil.downloadFileFromUrl(chatUser.getPortrait() + AppConstants.IMAGE_PARAM, FileUtil.file(PlatformConfig.ROOT_PATH));
-        QrConfig qrConfig = QrConfig.create().setWidth(AppConstants.QR_CODE_SIZE).setHeight(AppConstants.QR_CODE_SIZE).setImg(original);
-        byte[] data = QrCodeUtil.generatePng(content, qrConfig);
-        // 删除临时图片
-        FileUtil.del(original);
-        String value = AppConstants.BASE64_PREFIX.concat(Base64.encode(data));
-        redisUtils.set(AppConstants.REDIS_QR_CODE + userId, value, AppConstants.REDIS_QR_CODE_TIME, TimeUnit.DAYS);
-        return value;
+        return AppConstants.QR_CODE_USER + userId;
     }
 
     @Transactional
@@ -204,7 +176,7 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
 
     @Transactional
     @Override
-    public Dict doLogin(AuthenticationToken authenticationToken, String cid) {
+    public Dict doLogin(AuthenticationToken authenticationToken) {
         String msg = null;
         try {
             ShiroUtils.getSubject().login(authenticationToken);
@@ -220,30 +192,18 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
             throw new BaseException(msg);
         }
         Long userId = ShiroUtils.getUserId();
-        String token = this.getById(userId).getToken();
-        if (!StringUtils.isEmpty(token)) {
-            tokenService.deleteToken(token);
-        }
+        tokenService.deleteToken(this.getById(userId).getToken());
         // 生成新TOKEN
-        token = tokenService.generateToken();
+        String token = tokenService.generateToken();
         String version = ServletUtils.getRequest().getHeader(HeadConstant.VERSION);
         ChatUser chatUser = new ChatUser()
                 .setUserId(userId)
                 .setToken(token)
                 .setVersion(version);
-        if (!StringUtils.isEmpty(cid)) {
-            // 注册别名
-            chatPushService.setAlias(userId, cid);
-            // 更新cid
-            chatUser.setCid(cid);
-        }
         // 更新token
         this.updateById(chatUser);
         // 拉取离线消息
-        String device = ServletUtils.getRequest().getHeader(HeadConstant.DEVICE);
-        if (HeadConstant.DEVICE_IOS.contains(device) || HeadConstant.DEVICE_ANDROID.contains(device)) {
-            chatPushService.pullOffLine(userId);
-        }
+        chatPushService.pullMsg(userId);
         return Dict.create().set("token", token);
     }
 
@@ -251,7 +211,7 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
     public void logout() {
         try {
             // 移除缓存
-            removeCache();
+            this.removeCache();
             // 执行退出
             ShiroUtils.getSubject().logout();
             log.info("退出成功。。。。");
@@ -261,21 +221,10 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
     }
 
     @Override
-    public void bindCid(String cid) {
+    public void refresh() {
         Long userId = ShiroUtils.getUserId();
-        String version = ServletUtils.getRequest().getHeader(HeadConstant.VERSION);
-        ChatUser chatUser = getById(userId);
-        if (!cid.equalsIgnoreCase(chatUser.getCid())) {
-            // 更新cid
-            this.updateById(new ChatUser().setCid(cid).setUserId(userId).setVersion(version));
-            // 注册别名
-            chatPushService.setAlias(userId, cid);
-        } else if (!version.equalsIgnoreCase(chatUser.getVersion())) {
-            // 更新版本
-            this.updateById(new ChatUser().setVersion(version).setUserId(userId));
-        }
         // 拉取离线消息
-        chatPushService.pullOffLine(userId);
+        chatPushService.pullMsg(userId);
     }
 
     /**
@@ -286,15 +235,7 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
         ChatUser chatUser = this.getById(userId);
         if (chatUser != null) {
             // 清理token
-            String token = chatUser.getToken();
-            if (!StringUtils.isEmpty(token)) {
-                tokenService.deleteToken(token);
-            }
-            // 清理cid
-            String cid = chatUser.getCid();
-            if (!StringUtils.isEmpty(cid)) {
-                chatPushService.delAlias(userId, cid);
-            }
+            tokenService.deleteToken(chatUser.getToken());
         }
         String userStr = NumberUtil.toStr(userId);
         // 附近的人

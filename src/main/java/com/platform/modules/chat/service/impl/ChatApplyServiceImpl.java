@@ -5,8 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.exception.BaseException;
+import com.platform.common.redis.RedisUtils;
 import com.platform.common.shiro.ShiroUtils;
-import com.platform.common.utils.redis.RedisUtils;
 import com.platform.common.web.service.impl.BaseServiceImpl;
 import com.platform.modules.chat.dao.ChatApplyDao;
 import com.platform.modules.chat.domain.ChatApply;
@@ -18,7 +18,7 @@ import com.platform.modules.chat.service.ChatApplyService;
 import com.platform.modules.chat.service.ChatUserService;
 import com.platform.modules.chat.vo.ApplyVo02;
 import com.platform.modules.chat.vo.ApplyVo03;
-import com.platform.modules.push.enums.PushNoticeTypeEnum;
+import com.platform.modules.push.enums.PushNoticeEnum;
 import com.platform.modules.push.service.ChatPushService;
 import com.platform.modules.push.vo.PushParamVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,31 +86,7 @@ public class ChatApplyServiceImpl extends BaseServiceImpl<ChatApply> implements 
         }
         // 给好友发送通知
         PushParamVo paramVo = new PushParamVo().setToId(acceptId);
-        chatPushService.pushNotice(paramVo, PushNoticeTypeEnum.FRIEND_APPLY);
-    }
-
-    @Override
-    public void applyGroup(Long acceptId) {
-        Date now = DateUtil.date();
-        Long fromId = ShiroUtils.getUserId();
-        // 查询
-        ChatApply query = new ChatApply()
-                .setFromId(fromId)
-                .setToId(acceptId)
-                .setApplyType(ApplyTypeEnum.GROUP)
-                .setApplyStatus(ApplyStatusEnum.NONE);
-        ChatApply apply = this.queryOne(query);
-        query.setReason("申请加入群聊")
-                .setApplySource(ApplySourceEnum.SCAN)
-                .setCreateTime(now);
-        if (apply == null) {
-            this.add(query);
-        } else {
-            this.updateById(query.setId(apply.getId()));
-        }
-        // 给群主发送通知
-        PushParamVo paramVo = new PushParamVo().setToId(acceptId);
-        chatPushService.pushNotice(paramVo, PushNoticeTypeEnum.FRIEND_APPLY);
+        chatPushService.pushNotice(paramVo, PushNoticeEnum.FRIEND_APPLY);
     }
 
     @Override

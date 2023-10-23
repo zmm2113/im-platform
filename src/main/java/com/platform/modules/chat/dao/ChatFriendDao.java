@@ -18,8 +18,6 @@ public interface ChatFriendDao extends BaseDao<ChatFriend> {
 
     /**
      * 查询列表
-     *
-     * @return
      */
     List<ChatFriend> queryList(ChatFriend chatFriend);
 

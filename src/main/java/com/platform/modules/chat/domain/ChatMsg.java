@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.platform.common.web.domain.BaseEntity;
-import com.platform.modules.push.enums.PushMsgTypeEnum;
+import com.platform.modules.push.enums.PushMsgEnum;
 import com.platform.modules.push.enums.PushTalkEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -41,7 +41,7 @@ public class ChatMsg extends BaseEntity {
     /**
      * 消息类型
      */
-    private PushMsgTypeEnum msgType;
+    private PushMsgEnum msgType;
     /**
      * 消息类型
      */

@@ -20,11 +20,6 @@ public interface ChatApplyService extends BaseService<ChatApply> {
     void applyFriend(Long acceptId, ApplySourceEnum source, String reason);
 
     /**
-     * 申请加群
-     */
-    void applyGroup(Long acceptId);
-
-    /**
      * 申请记录
      */
     PageInfo list();

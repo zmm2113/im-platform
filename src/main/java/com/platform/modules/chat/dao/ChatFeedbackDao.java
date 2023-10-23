@@ -3,6 +3,7 @@ package com.platform.modules.chat.dao;
 import com.platform.modules.chat.domain.ChatFeedback;
 import org.springframework.stereotype.Repository;
 import com.platform.common.web.dao.BaseDao;
+
 import java.util.List;
 
 /**
@@ -16,8 +17,6 @@ public interface ChatFeedbackDao extends BaseDao<ChatFeedback> {
 
     /**
      * 查询列表
-     *
-     * @return
      */
     List<ChatFeedback> queryList(ChatFeedback chatFeedback);
 

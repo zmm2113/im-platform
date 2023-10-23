@@ -15,10 +15,6 @@ public enum FriendTypeEnum {
      */
     NORMAL("normal", "正常"),
     /**
-     * 图灵机器人
-     */
-    TURING("turing", "图灵机器人"),
-    /**
      * 天气机器人
      */
     WEATHER("weather", "天气机器人"),

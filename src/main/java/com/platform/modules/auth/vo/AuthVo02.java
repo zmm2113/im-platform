@@ -19,9 +19,4 @@ public class AuthVo02 {
     @NotBlank(message = "密码不能为空")
     private String password;
 
-    /**
-     * 推送ID
-     */
-    private String cid;
-
 }

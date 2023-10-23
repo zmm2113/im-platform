@@ -3,7 +3,7 @@ package com.platform.modules.ws;
 import cn.hutool.extra.spring.SpringUtil;
 import com.platform.common.constant.AppConstants;
 import com.platform.common.constant.HeadConstant;
-import com.platform.common.shiro.vo.LoginUser;
+import com.platform.common.shiro.LoginUser;
 import com.platform.modules.auth.service.TokenService;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -21,7 +21,7 @@ public class BootWebSocketInterceptor extends HttpSessionHandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) throws Exception {
-        //接受jsp传来的参数
+        // 接受前端传来的参数
         String token = ((ServletServerHttpRequest) request).getServletRequest().getParameter(HeadConstant.TOKEN_HEADER_ADMIN);
         if (StringUtils.isEmpty(token)) {
             return false;
@@ -34,12 +34,6 @@ public class BootWebSocketInterceptor extends HttpSessionHandshakeInterceptor {
         //将参数放到attributes
         attributes.put(AppConstants.USER_ID, loginUser.getUserId());
         return super.beforeHandshake(request, response, wsHandler, attributes);
-    }
-
-    @Override
-    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
-                               Exception ex) {
-        super.afterHandshake(request, response, wsHandler, ex);
     }
 
 }

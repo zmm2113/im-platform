@@ -51,10 +51,6 @@ public class ChatGroupInfo extends BaseEntity {
      */
     private YesOrNoEnum keepGroup;
     /**
-     * 是否被踢
-     */
-    private YesOrNoEnum kicked;
-    /**
      * 加入时间
      */
     private Date createTime;
@@ -66,6 +62,5 @@ public class ChatGroupInfo extends BaseEntity {
         this.top = YesOrNoEnum.NO;
         this.disturb = YesOrNoEnum.NO;
         this.keepGroup = YesOrNoEnum.NO;
-        this.kicked = YesOrNoEnum.NO;
     }
 }

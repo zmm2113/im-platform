@@ -1,6 +1,5 @@
 package com.platform.modules.chat.utils;
 
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReUtil;
 import com.platform.common.exception.BaseException;
 import com.platform.modules.chat.config.TencentConfig;
@@ -8,9 +7,6 @@ import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
-import com.tencentcloudapi.nlp.v20190408.NlpClient;
-import com.tencentcloudapi.nlp.v20190408.models.ChatBotRequest;
-import com.tencentcloudapi.nlp.v20190408.models.ChatBotResponse;
 import com.tencentcloudapi.tmt.v20180321.TmtClient;
 import com.tencentcloudapi.tmt.v20180321.models.SpeechTranslateRequest;
 import com.tencentcloudapi.tmt.v20180321.models.SpeechTranslateResponse;
@@ -61,33 +57,6 @@ public class TencentUtils {
         builder.append("译文：");
         builder.append(resp.getTargetText());
         return builder.toString();
-    }
-
-    /**
-     * 图灵机器人调用
-     */
-    public static String turing(TencentConfig tencentConfig, Long userId, String content) {
-        try {
-            Credential cred = new Credential(tencentConfig.getAppKey(), tencentConfig.getAppSecret());
-            // 实例化一个http选项，可选的，没有特殊需求可以跳过
-            HttpProfile httpProfile = new HttpProfile();
-            httpProfile.setEndpoint("nlp.tencentcloudapi.com");
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
-            ClientProfile clientProfile = new ClientProfile();
-            clientProfile.setHttpProfile(httpProfile);
-            // 实例化要请求产品的client对象,clientProfile是可选的
-            NlpClient client = new NlpClient(cred, "ap-guangzhou", clientProfile);
-            // 实例化一个请求对象,每个接口都会对应一个request对象
-            ChatBotRequest req = new ChatBotRequest();
-            req.setOpenId(NumberUtil.toStr(userId));
-            req.setQuery(content);
-            // 返回的resp是一个ChatBotResponse的实例，与请求对象对应
-            ChatBotResponse resp = client.ChatBot(req);
-            // 输出json格式的字符串回包
-            return resp.getReply();
-        } catch (Exception e) {
-            throw new BaseException("图灵机器人接口调用异常，请稍后再试");
-        }
     }
 
     /**

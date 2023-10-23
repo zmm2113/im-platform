@@ -1,7 +1,7 @@
 package com.platform.modules.push.service;
 
-import com.platform.modules.push.enums.PushMsgTypeEnum;
-import com.platform.modules.push.enums.PushNoticeTypeEnum;
+import com.platform.modules.push.enums.PushMsgEnum;
+import com.platform.modules.push.enums.PushNoticeEnum;
 import com.platform.modules.push.vo.PushParamVo;
 
 import java.util.List;
@@ -15,43 +15,38 @@ import java.util.List;
 public interface ChatPushService {
 
     /**
-     * 注册别名
+     * 发送个人消息
      */
-    void setAlias(Long userId, String cid);
+    void pushMsg(PushParamVo from, PushMsgEnum msgType);
 
     /**
-     * 解除别名
+     * 发送个人消息
      */
-    void delAlias(Long userId, String cid);
+    void pushMsg(List<PushParamVo> userList, PushMsgEnum msgType);
 
     /**
-     * 发送消息
+     * 发送群组消息
      */
-    void pushMsg(PushParamVo from, PushMsgTypeEnum msgType);
+    void pushGroupMsg(PushParamVo from, PushParamVo group, PushMsgEnum msgType);
 
     /**
-     * 发送消息
+     * 发送群组消息
      */
-    void pushMsg(List<PushParamVo> userList, PushMsgTypeEnum msgType);
-
-    /**
-     * 发送消息
-     */
-    void pushMsg(List<PushParamVo> userList, PushParamVo group, PushMsgTypeEnum msgType);
+    void pushGroupMsg(List<PushParamVo> userList, PushParamVo group, PushMsgEnum msgType);
 
     /**
      * 拉取离线消息
      */
-    void pullOffLine(Long userId);
+    void pullMsg(Long userId);
 
     /**
      * 发送通知
      */
-    void pushNotice(PushParamVo paramVo, PushNoticeTypeEnum pushNoticeType);
+    void pushNotice(PushParamVo paramVo, PushNoticeEnum pushNotice);
 
     /**
      * 发送通知
      */
-    void pushNotice(List<PushParamVo> userList, PushNoticeTypeEnum pushNoticeType);
+    void pushNotice(List<PushParamVo> userList, PushNoticeEnum pushNotice);
 
 }

@@ -25,8 +25,6 @@ public class NearController extends BaseController {
 
     /**
      * 发送附近的人
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @PostMapping(value = "/doNear")
@@ -36,8 +34,6 @@ public class NearController extends BaseController {
 
     /**
      * 关闭附近的人
-     *
-     * @return 结果
      */
     @ApiVersion(VersionEnum.V1_0_0)
     @GetMapping(value = "/closeNear")

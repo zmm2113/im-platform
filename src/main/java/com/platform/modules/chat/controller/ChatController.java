@@ -32,13 +32,4 @@ public class ChatController extends BaseController {
         return AjaxResult.success(chatMsgService.sendFriendMsg(chatVo));
     }
 
-    /**
-     * 获取大消息
-     */
-    @ApiVersion(VersionEnum.V1_0_0)
-    @GetMapping("/getBigMsg/{msgId}")
-    public AjaxResult getBigMsg(@PathVariable String msgId) {
-        return AjaxResult.success(chatMsgService.getBigMsg(msgId));
-    }
-
 }
