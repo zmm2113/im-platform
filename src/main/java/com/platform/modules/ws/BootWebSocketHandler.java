@@ -83,21 +83,20 @@ public class BootWebSocketHandler extends TextWebSocketHandler {
     /**
      * 给某个用户发送消息
      */
-    public boolean sendMsg(Long userId, String content) {
+    public void sendMsg(Long userId, String content) {
         WebSocketSession session = POOL_SESSION.get(userId);
         if (session == null) {
-            return false;
+            return;
         }
         if (!session.isOpen()) {
             this.closeSession(session);
-            return false;
+            return;
         }
         try {
             session.sendMessage(new TextMessage(content));
         } catch (IOException e) {
             this.closeSession(session);
         }
-        return true;
     }
 
 }

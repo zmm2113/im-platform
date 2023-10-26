@@ -160,11 +160,7 @@ public class ChatPushServiceImpl implements ChatPushService {
         // 组装消息
         String content = JSONUtil.toJsonStr(pushBodyVo);
         // 发送消息
-        boolean result = bootWebSocketHandler.sendMsg(userId, content);
-        // 发送成功
-        if (result) {
-            return;
-        }
+        bootWebSocketHandler.sendMsg(userId, content);
         // 离线消息
         String redisKey = StrUtil.format(AppConstants.REDIS_MSG, userId, pushBodyVo.getMsgId());
         redisUtils.set(redisKey, content, AppConstants.REDIS_MSG_TIME, TimeUnit.DAYS);

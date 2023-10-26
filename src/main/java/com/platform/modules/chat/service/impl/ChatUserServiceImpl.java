@@ -202,8 +202,6 @@ public class ChatUserServiceImpl extends BaseServiceImpl<ChatUser> implements Ch
                 .setVersion(version);
         // 更新token
         this.updateById(chatUser);
-        // 拉取离线消息
-        chatPushService.pullMsg(userId);
         return Dict.create().set("token", token);
     }
 
